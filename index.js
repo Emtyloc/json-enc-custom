@@ -49,12 +49,12 @@ function encodingAlgorithm(parameters) {
 
 function JSONEncodingPath(name) {
     console.log(name);
-    // Object that represents the failure situation
-    const FAILURE = [{ "type": "object", "key": "original", "last": true, "append": false, "next_type": null }];
     // Let path be the path we are to parse.
     let path = name;
     // Let original be a copy of path
     let original = path;
+    // Object that represents the failure situation
+    const FAILURE = [{ "type": "object", "key": original, "last": true, "append": false, "next_type": null }];
     // Let steps be an empty list of steps.
     let steps = Array();
     // Let first key be the result of collecting a sequence of characters that are not U+005B LEFT SQUARE BRACKET ("[") from the path
