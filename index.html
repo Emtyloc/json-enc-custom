@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://unpkg.com/htmx.org@1.9.6"></script>
+    <script src="index.js"></script>
+</head>
+
+<body>
+    <form id="test-form" hx-ext="json-enc" hx-post="/" style="display: flex; flex-direction: column;">
+        <input name='kids[0]' value='Void'>
+        <input name='kids[1]' value='PETER'>
+
+        <button type="submit">Enviar</button>
+    </form>
+</body>
