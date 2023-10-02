@@ -37,18 +37,18 @@ function encodingAlgorithm(parameters) {
             // Update context to be the value returned by the steps to set a JSON encoding value ran below.
             context = JSONEncodingValue(context, current_value, steps[step_index], PARAM_VALUES[param_index]);
         }
-
-        // Let result be the value returned from calling the stringify operation with resulting object as its first parameter and the two remaining parameters left undefined.
-        // Encode result as UTF-8 and return the resulting byte stream
-        let result = JSON.stringify(resultingObject, undefined, undefined);
-        const encoder = new TextEncoder;
-        const encodedBytes = encoder.encode(result);
-        console.log(encodedBytes);
     }
+    // Let result be the value returned from calling the stringify operation with resulting object as its first parameter and the two remaining parameters left undefined.
+    // Encode result as UTF-8 and return the resulting byte stream
+    let result = JSON.stringify(resultingObject, undefined, undefined);
+
+    console.log(result);
+    const encoder = new TextEncoder;
+    const encodedBytes = encoder.encode(result);
+    console.log(encodedBytes);
 }
 
 function JSONEncodingPath(name) {
-    console.log(name);
     // Let path be the path we are to parse.
     let path = name;
     // Let original be a copy of path
@@ -153,6 +153,103 @@ function JSONEncodingPath(name) {
     return steps;
 }
 
-function JSONEncodingValue(context, current_value, step) {
-    console.log()
+function JSONEncodingValue(context, current_value, step, value) {
+    // Let context be the context this algorithm is called with
+    // Let step be the step of the path this algorithm is called with.
+    // Let current value be the current value this algorithm is called with.
+    // Let entry value be the entry value this algorithm is called with
+    let entry_value = value;
+
+    // If step has its last flag set, run the following substeps:
+    if (step["last"] === true) {
+        // If current value is undefined, run the following subsubsteps:
+        if (current_value === undefined) {
+            // If step's append flag is set,
+            // set the context's property named by the step's key to a new Array containing
+            // entry value as its only member.
+            if (step["append"] === true) {
+                context[step["key"]] = [entry_value];
+            }
+            // Otherwise, set the context's property named by the step's key to entry value.
+            else {
+                context[step["key"]] = entry_value;
+            }
+        }
+        // Else if current value is an Array, then get the context's property named by the step's key
+        // and push entry value onto it.
+        else if (Array.isArray(current_value)) {
+            let context_property = context[step["key"]];
+            context_property.push(entry_value);
+        }
+        // Else if current value is an Object and the is file flag is not set,
+        // then run the steps to set a JSON encoding value with context set to the current value;
+        // a step with its type set to "object", its key set to the empty string,
+        // and its last flag set; current value set to the current value's property named by the empty string;
+        // the entry value; and the is file flag. Return the result.
+        else if (typeof current_value === "object" && current_value !== null) {
+            let tmp_step = step;
+            tmp_step["type"] = "object";
+            tmp_step["key"] = "";
+            tmp_step["last"] = true;
+            JSONEncodingValue(current_value, current_value[""], tmp_step, entry_value);
+        }
+        // Otherwise, set the context's property named by 
+        // the step's key to an Array containing current value and entry value, in this order.
+        else {
+            context[step["key"]] = [current_value, entry_value];
+        }
+        return context;
+    }
+    // Otherwise, run the following subsubsteps:
+    else {
+        // If current value is undefined, run the following subsubsteps:
+        if (current_value === undefined) {
+            // If step's next type is "array",
+            // set the context's property named by the step's key to a new empty Array and return it.
+            if (step["next_type"] === "array") {
+                context[step["key"]] = [];
+                return context;
+            }
+            // Otherwise,set the context's property named by the step's key to a new empty Object and return it.
+            else {
+                context[step["key"]] = Object.create(null);
+                return context;
+            }
+        }
+        // Else if current value is an Object,
+        // then return the value of the context's property named by the step's key.
+        else if (typeof current_value === "object" && current_value !== null) {
+            return context[step["key"]];
+        }
+        // Else if current value is an Array, then rub the following subsubsteps:
+        else if (Array.isArray(current_value)) {
+            // If step's next type is "array", return current value.
+            if (step["next_type"] === "array") return current_value;
+            // Otherwise, run the following subsubsubsteps:
+            else {
+                // Let object be a new empty Object.
+                let object = Object.create(null);
+                // For each item and zero-based index i in current value,
+                // if item is not undefined then set a property of object named i to item.
+                for (let i = 0; i < current_value.length; i++) {
+                    let item = current_value[i];
+                    if (item !== undefined) object[i] = item;
+                    else context[step["key"]] = object;
+                }
+                return object;
+            }
+        }
+        // Otherwise, run the following subsubsteps
+        else {
+            // Let object be a new Object with a property named by the empty string set to current value.
+            let object = Object.create(null);
+            object[""] = current_value;
+            // Set the context's property named by the step's key to object.
+            context[step["key"]] = object;
+            // Return object.
+            return object;
+        }
+
+    }
+
 }
