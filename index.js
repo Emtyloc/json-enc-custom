@@ -32,7 +32,7 @@ function encodingAlgorithm(parameters) {
         // For each step in the list of steps, run the following subsubsteps
         for (let step_index = 0; step_index < steps.length; step_index++) {
             // Let the current value be the value obtained by getting the step's key from the current context.
-            let current_value = Object.keys(context)[step_index];
+            let current_value = context[steps[step_index]["key"]];
             // Run the steps to set a JSON encoding value with the current context, the step, the current value, the entry's value
             // Update context to be the value returned by the steps to set a JSON encoding value ran below.
             context = JSONEncodingValue(context, current_value, steps[step_index], PARAM_VALUES[param_index]);
