@@ -99,6 +99,8 @@ function setValueFromPath(context, step, value) {
         context[step.key] = value;
     }
 
+    //TODO: make append, merge functionality and file suport.
+
     //check if the context value already exists
     if (context[step.key] === undefined) {
         if (step.type === "object") {
