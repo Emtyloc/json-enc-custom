@@ -22,10 +22,15 @@ function encodingAlgorithm(parameters) {
         let name = PARAM_NAMES[param_index];
         let value = PARAM_VALUES[param_index];
         let steps = JSONEncodingPath(name);
-        console.log(steps);
+        let context = resultingObject;
+
+        for (let step_index = 0; step_index < steps.length; step_index++) {
+            let step = steps[step_index];
+            context = setValueFromPath(context, step, value);
+        }
     }
 
-    let result = JSON.stringify(resultingObject, undefined, undefined);
+    let result = JSON.stringify(resultingObject);
 }
 
 
@@ -42,7 +47,7 @@ function JSONEncodingPath(name) {
     if (first_key === "") return FAILURE;
     path = path.slice(first_key.length);
     steps.push({ "type": "object", "key": first_key, "last": false, "append": false, "next_type": null });
-    while (path !== "") {
+    while (path.length) {
         // []
         if (path[0] === "[" && path[1] === "]") {
             let last_step = steps[steps.length - 1];
@@ -62,7 +67,7 @@ function JSONEncodingPath(name) {
             steps.push({ "type": "array", "key": numeric_key, "last": false, "append": false, "next_type": null });
             continue
         }
-        // [llave]
+        // [key]
         if (/^\[[^\]]+\]/.test(path)) {
             path = path.slice(1);
             let collected_characters = path.match(/[^\]]+/)[0];
@@ -89,5 +94,38 @@ function JSONEncodingPath(name) {
     return steps;
 }
 
+function setValueFromPath(context, step, value) {
+    if (step.last) {
+        context[step.key] = value;
+    }
 
+    //check if the context value already exists
+    if (context[step.key] === undefined) {
+        if (step.type === "object") {
+            if (step.next_type === "object") {
+                context[step.key] = {};
+                return context[step.key];
+            }
+            if (step.next_type === "array") {
+                context[step.key] = [];
+                return context[step.key];
+            }
+        }
+        if (step.type === "array") {
+            if (step.next_type === "object") {
+                context[step.key] = {};
+                return context[step.key];
+            }
+            if (step.next_type === "array") {
+                context[step.key] = [];
+                return context[step.key];
+            }
+        }
+    }
+    else {
+        return context[step.key];
+    }
+
+
+}
 

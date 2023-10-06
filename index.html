@@ -11,9 +11,10 @@
 
 <body>
     <form id="test-form" hx-ext="json-enc" hx-post="/" style="display: flex; flex-direction: column;">
-        <input type='number' name='bottle-on-wall' value='1'>
-        <input type='number' name='bottle-on-wall' value='2'>
-        <input type='number' name='bottle-on-wall' value='3'>
+        <input name='pet[0][species]' value='Dahut'>
+        <input name='pet[0][name]' value='Hypatia'>
+        <input name='pet[1][species]' value='Felis Stultus'>
+        <input name='pet[1][name]' value='Billie'>
         <button type="submit">Enviar</button>
     </form>
 </body>
