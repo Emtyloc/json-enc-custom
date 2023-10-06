@@ -6,13 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <script src="https://unpkg.com/htmx.org@1.9.6"></script>
-    <script src="index.js"></script>
+    <script src="json-enc-custom.js"></script>
 </head>
 
 <body>
     <!-- This is a form example -->
-    <form id="test-form" hx-ext="json-enc" hx-post="/" style="display: flex; flex-direction: column;">
-        <input name='wow[such][deep][3][much][power][!]' value='Amaze'>
+    <form id="test-form" hx-ext="json-enc-custom" hx-post="/" style="display: flex; flex-direction: column;">
+        <input name='index[0][1]' value='Amaze'>
+        <input name='index[0][0]' value='Amaze2'>
         <button type="submit">Enviar</button>
     </form>
 </body>
