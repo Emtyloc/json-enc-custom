@@ -2,7 +2,7 @@
 This is a custom extension for htmx, it takes the parameters from json-enc extension, and parse the names of the forms like the examples below:
 ```html
 EXAMPLE 1: Basic Keys
-<form hx-ext='json-enc'>
+<form hx-ext='json-enc-custom'>
   <input name='name' value='Bender'>
   <select name='hind'>
     <option selected>Bitable</option>
@@ -20,7 +20,7 @@ EXAMPLE 1: Basic Keys
 ```
 ```html
 EXAMPLE 2: Multiple Values
-<form hx-ext='json-enc'>
+<form hx-ext='json-enc-custom'>
   <input type='number' name='bottle-on-wall' value='1'>
   <input type='number' name='bottle-on-wall' value='2'>
   <input type='number' name='bottle-on-wall' value='3'>
@@ -33,7 +33,7 @@ EXAMPLE 2: Multiple Values
 ```
 ```html
 EXAMPLE 3: Deeper Structure
-<form hx-ext='json-enc'>
+<form hx-ext='json-enc-custom'>
   <input name='pet[species]' value='Dahut'>
   <input name='pet[name]' value='Hypatia'>
   <input name='kids[1]' value='Thelma'>
@@ -51,7 +51,7 @@ EXAMPLE 3: Deeper Structure
 ```
 ```html
 EXAMPLE 4: Sparse Arrays
-<form hx-ext='json-enc'>
+<form hx-ext='json-enc-custom'>
   <input name='hearbeat[0]' value='thunk'>
   <input name='hearbeat[2]' value='thunk'>
 </form>
@@ -63,7 +63,7 @@ EXAMPLE 4: Sparse Arrays
 ```
 ```html
 EXAMPLE 5: Even Deeper
-<form hx-ext='json-enc'>
+<form hx-ext='json-enc-custom'>
   <input name='pet[0][species]' value='Dahut'>
   <input name='pet[0][name]' value='Hypatia'>
   <input name='pet[1][species]' value='Felis Stultus'>
@@ -86,7 +86,7 @@ EXAMPLE 5: Even Deeper
 ```
 ```html
 EXAMPLE 6: Such Deep
-<form hx-ext='json-enc'>
+<form hx-ext='json-enc-custom'>
   <input name='wow[such][deep][3][much][power][!]' value='Amaze'>
 </form>
 
@@ -112,7 +112,7 @@ EXAMPLE 6: Such Deep
 ```
 ```html
 EXAMPLE 10: Bad input
-<form hx-ext='json-enc'>
+<form hx-ext='json-enc-custom'>
   <input name='error[good]' value='BOOM!'>
   <input name='error[bad' value='BOOM BOOM!'>
 </form>
