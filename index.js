@@ -6,8 +6,8 @@ htmx.defineExtension('json-enc', {
     },
     encodeParameters: function (xhr, parameters, elt) {
         xhr.overrideMimeType('text/json');
-        encodingAlgorithm(parameters);
-        return (JSON.stringify(parameters));
+        let encoded_parameters = encodingAlgorithm(parameters);
+        return (JSON.stringify(encoded_parameters));
     }
 });
 
@@ -30,6 +30,7 @@ function encodingAlgorithm(parameters) {
     }
 
     let result = JSON.stringify(resultingObject);
+    return result
 }
 
 
