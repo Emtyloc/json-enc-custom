@@ -7,7 +7,7 @@ htmx.defineExtension('json-enc-custom', {
     encodeParameters: function (xhr, parameters, elt) {
         xhr.overrideMimeType('text/json');
         let encoded_parameters = encodingAlgorithm(parameters);
-        return (JSON.stringify(encoded_parameters));
+        return encoded_parameters;
     }
 });
 
