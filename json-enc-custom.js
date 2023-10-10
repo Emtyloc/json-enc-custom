@@ -33,11 +33,10 @@ function encodingAlgorithm(parameters) {
     return result
 }
 
-
 function JSONEncodingPath(name) {
     let path = name;
     let original = path;
-    const FAILURE = [{ "type": "object", "key": original, "last": true, "append": false, "next_type": null }];
+    const FAILURE = [{ "type": "object", "key": original, "last": true, "next_type": null }];
     let steps = Array();
     let first_key = String();
     for (let i = 0; i < path.length; i++) {
@@ -46,35 +45,26 @@ function JSONEncodingPath(name) {
     }
     if (first_key === "") return FAILURE;
     path = path.slice(first_key.length);
-    steps.push({ "type": "object", "key": first_key, "last": false, "append": false, "next_type": null });
+    steps.push({ "type": "object", "key": first_key, "last": false, "next_type": null });
     while (path.length) {
-        // []
-        if (path[0] === "[" && path[1] === "]") {
-            let last_step = steps[steps.length - 1];
-            last_step["append"] = true;
-            steps[steps.length - 1] = last_step;
-            path = path.slice(2);
-            if (path.length > 0) return FAILURE;
-            else continue;
-        }
-        // [1...]
+        // [123...]
         if (/^\[\d+\]/.test(path)) {
             path = path.slice(1);
             let collected_digits = path.match(/\d+/)[0]
             path = path.slice(collected_digits.length);
             let numeric_key = parseInt(collected_digits, 10);
             path = path.slice(1);
-            steps.push({ "type": "array", "key": numeric_key, "last": false, "append": false, "next_type": null });
+            steps.push({ "type": "array", "key": numeric_key, "last": false, "next_type": null });
             continue
         }
-        // [key]
+        // [abc...]
         if (/^\[[^\]]+\]/.test(path)) {
             path = path.slice(1);
             let collected_characters = path.match(/[^\]]+/)[0];
             path = path.slice(collected_characters.length);
             let object_key = collected_characters;
             path = path.slice(1);
-            steps.push({ "type": "object", "key": object_key, "last": false, "append": false, "next_type": null });
+            steps.push({ "type": "object", "key": object_key, "last": false, "next_type": null });
             continue;
         }
         return FAILURE;
@@ -99,7 +89,7 @@ function setValueFromPath(context, step, value) {
         context[step.key] = value;
     }
 
-    //TODO: make append, merge functionality and file suport.
+    //TODO: make merge functionality and file suport.
 
     //check if the context value already exists
     if (context[step.key] === undefined) {
@@ -127,7 +117,4 @@ function setValueFromPath(context, step, value) {
     else {
         return context[step.key];
     }
-
-
 }
-
