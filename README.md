@@ -1,7 +1,7 @@
 # json-enc-custom
 This is a custom extension for htmx, it takes the parameters from encodeParameters https://htmx.org/extensions/#defining, and parse the names of the forms like the examples below:
 ```html
-EXAMPLE 1: Basic Keys
+EXAMPLE 1: Basic Keys (the checkbox default value could be "on" check issue #2 for more info.)
 <form hx-ext='json-enc-custom'>
   <input name='name' value='Bender'>
   <select name='hind'>
@@ -15,7 +15,7 @@ EXAMPLE 1: Basic Keys
 {
   "name":   "Bender",
   "hind":   "Bitable",
-  "shiny":  true
+  "shiny":  true/"on"
 }
 ```
 ```html
