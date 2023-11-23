@@ -28,7 +28,7 @@ EXAMPLE 2: Multiple Values
 
 // produces
 {
-  "bottle-on-wall":   [1, 2, 3]
+  "bottle-on-wall":   ["1", "2", "3"]
 }
 ```
 ```html
