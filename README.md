@@ -43,10 +43,10 @@ EXAMPLE 3: Deeper Structure
 // produces
 {
     "pet":  {
-        "species":  "Dahut"
-    ,   "name":     "Hypatia"
-    }
-,   "kids":   ["Ashley", "Thelma"]
+        "species":  "Dahut",
+        "name":     "Hypatia"
+    },
+    "kids":   ["Ashley", "Thelma"]
 }
 ```
 ```html
@@ -74,12 +74,12 @@ EXAMPLE 5: Even Deeper
 {
     "pet":  [
         {
-            "species":  "Dahut"
-        ,   "name":     "Hypatia"
-        }
-    ,   {
-            "species":  "Felis Stultus"
-        ,   "name":     "Billie"
+            "species":  "Dahut",
+            "name":     "Hypatia"
+        },
+        {
+            "species":  "Felis Stultus",
+            "name":     "Billie"
         }
     ]
 }
@@ -95,10 +95,10 @@ EXAMPLE 6: Such Deep
     "wow":  {
         "such": {
             "deep": [
-                null
-            ,   null
-            ,   null
-            ,   {
+                null,
+                null,
+                null,
+                {
                     "much": {
                         "power": {
                             "!":  "Amaze"
@@ -121,8 +121,8 @@ EXAMPLE 10: Bad input
 {
     "error": {
         "good":   "BOOM!"
-    }
-,   "error[bad":  "BOOM BOOM!"
+    },
+    "error[bad":  "BOOM BOOM!"
 }
 ```
 references: https://www.w3.org/TR/html-json-forms/
