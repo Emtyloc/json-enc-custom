@@ -1,5 +1,5 @@
 # json-enc-custom
-This is a custom extension for htmx, it takes the parameters from encodeParameters https://htmx.org/extensions/#defining, and parse the names of the forms like the examples below:
+This is a [custom extension](https://github.com/bigskysoftware/htmx-extensions/tree/main?tab=readme-ov-file#defining-an-extension) for htmx, it takes the parameters from encodeParameters, and parse the names of the forms like the examples below:
 ```html
 EXAMPLE 1: Basic Keys
 <form hx-ext='json-enc-custom'>
