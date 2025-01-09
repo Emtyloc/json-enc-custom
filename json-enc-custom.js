@@ -20,6 +20,8 @@ function encodingAlgorithm(parameters) {
     for (let param_index = 0; param_index < PARAM_LENGHT; param_index++) {
         let name = PARAM_NAMES[param_index];
         let value = PARAM_VALUES[param_index];
+        // Detect data type and convert appropriately
+        value = detectDataType(name, value);
         let steps = JSONEncodingPath(name);
         let context = resultingObject;
 
@@ -117,4 +119,22 @@ function setValueFromPath(context, step, value) {
     else {
         return context[step.key];
     }
+}
+
+// Detect data type and convert appropriately
+function detectDataType(name, value) {
+    const inputElement = document.querySelector(`[name="${name}"]`);
+
+    // Handle checkboxes separately
+    if (inputElement && inputElement.type === "checkbox") {
+        return inputElement.checked ? true : false;
+    }
+
+    // Handle numbers (only for <input type="number | range">)
+    if (inputElement && (inputElement.type === "number" || inputElement.type === "range")) {
+        return Number(value);
+    }
+
+    // Return the value as a string for all other cases
+    return value;
 }
