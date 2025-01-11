@@ -1,120 +1,155 @@
+/**
+ * Initializes the extension and registers it with HTMX.
+ *
+ * @see https://htmx.org/api/#defineExtension
+ *
+ * @param {string} name - The extension name
+ * @param {Partial<HtmxExtension>} extension - The extension definition object.
+ */
 htmx.defineExtension('json-enc-custom', {
-    onEvent: function (name, evt) {
-        if (name === "htmx:configRequest") {
-            evt.detail.headers['Content-Type'] = "application/json";
-        }
+    /**
+     * Init saves the provided reference to the internal HTMX API.
+     *
+     * @param {import("../htmx").HtmxInternalApi} api
+     * @returns void
+     */
+    init: function(apiRef) {
+      // store a reference to the internal API.
+      this._api = apiRef;
+  
+      // Define the flag as a possess property
+      this._flagArray = ':flagArray';
     },
-    encodeParameters: function (xhr, parameters, elt) {
-        xhr.overrideMimeType('text/json');
-        let encoded_parameters = encodingAlgorithm(parameters);
-        return encoded_parameters;
-    }
-});
-
-function encodingAlgorithm(parameters) {
-    let resultingObject = Object.create(null);
-    const PARAM_NAMES = Object.keys(parameters);
-    const PARAM_VALUES = Object.values(parameters);
-    const PARAM_LENGHT = PARAM_NAMES.length;
-
-    for (let param_index = 0; param_index < PARAM_LENGHT; param_index++) {
-        let name = PARAM_NAMES[param_index];
-        let value = PARAM_VALUES[param_index];
-        let steps = JSONEncodingPath(name);
-        let context = resultingObject;
-
-        for (let step_index = 0; step_index < steps.length; step_index++) {
-            let step = steps[step_index];
-            context = setValueFromPath(context, step, value);
+  
+    onEvent: function(name, evt) {
+      if (name === 'htmx:configRequest') {
+        evt.detail.headers['Content-Type'] = 'application/json';
+      }
+    },
+  
+    encodeParameters: function(xhr, parameters, elt) {
+      xhr.overrideMimeType('text/json');
+  
+      // User configuration options.
+      this._config = {
+        'ignoreParseTypes': this._api.hasAttribute(elt, 'ignore-parse-types')
+      };
+  
+      return this._encodingAlgorithm(parameters, elt);
+    },
+  
+    /**
+     * Encodes form data into a JSON object using the custom algorithm.
+     *
+     * @param {FormData} parameters - Form data to encode.
+     * @param {Element} elt - The element providing the context for encoding.
+     * @returns {Object} A JSON string representing the encoded parameters.
+     */
+    _encodingAlgorithm: function(parameters, elt) {
+      let resultingObject = Object.create(null);
+  
+      for (let [name, value] of Object.entries(parameters)) {
+        const input = elt.elements[name];
+        let inputType;
+        if (Array.isArray(value)) {
+          inputType = input[0].type
+        } else {
+          inputType = input.type
         }
-    }
-
-    let result = JSON.stringify(resultingObject);
-    return result
-}
-
-function JSONEncodingPath(name) {
-    let path = name;
-    let original = path;
-    const FAILURE = [{ "type": "object", "key": original, "last": true, "next_type": null }];
-    let steps = Array();
-    let first_key = String();
-    for (let i = 0; i < path.length; i++) {
-        if (path[i] !== "[") first_key += path[i];
-        else break;
-    }
-    if (first_key === "") return FAILURE;
-    path = path.slice(first_key.length);
-    steps.push({ "type": "object", "key": first_key, "last": false, "next_type": null });
-    while (path.length) {
-        // [123...]
-        if (/^\[\d+\]/.test(path)) {
-            path = path.slice(1);
-            let collected_digits = path.match(/\d+/)[0]
-            path = path.slice(collected_digits.length);
-            let numeric_key = parseInt(collected_digits, 10);
-            path = path.slice(1);
-            steps.push({ "type": "array", "key": numeric_key, "last": false, "next_type": null });
-            continue
+  
+        this._setValueByPath(resultingObject, name, value, inputType)
+      }
+  
+      this._clearFlagArray(resultingObject);
+      return JSON.stringify(resultingObject);
+    },
+  
+    /**
+     * Sets a value in the resulting object at the specified path.
+     *
+     * @param {Object} obj - The target object to set the value in.
+     * @param {String} path - The path where the value should be set (e.g., 'a.b[0].c').
+     * @param {String} value - The value to set at the specified path.
+     * @param {String} inputType - The type of input element (e.g., "text", "number").
+     * @returns void
+     */
+    _setValueByPath: function(obj, path, value, inputType) {
+      if (!this._config.ignoreParseTypes) {
+        value = this._convertValue(value, inputType);
+      }
+  
+      // Convert 'a[b][c]' or 'a.b[c]' to ['a', 'b', 'c']
+      const pathParts = path.replace(/\]/g, '').split(/\[|\./);
+  
+      let current = obj;
+      for (let i = 0; i < pathParts.length; i++) {
+        const key = pathParts[i];
+  
+        // If 'key' is a number, mark the parent as an array.
+        if (!isNaN(key)) {
+          current[this._flagArray] = true;
         }
-        // [abc...]
-        if (/^\[[^\]]+\]/.test(path)) {
-            path = path.slice(1);
-            let collected_characters = path.match(/[^\]]+/)[0];
-            path = path.slice(collected_characters.length);
-            let object_key = collected_characters;
-            path = path.slice(1);
-            steps.push({ "type": "object", "key": object_key, "last": false, "next_type": null });
-            continue;
+  
+        if (i === pathParts.length - 1) {
+          current[key] = value; // Set the value at the final path part
+        } else {
+          // If the key doesn't exist or isn't an object, create an empty object
+          if (typeof current[key] !== 'object' || current[key] === null) {
+            current[key] = {};
+          }
+          current = current[key]; // Move deeper into the object
         }
-        return FAILURE;
-    }
-    for (let step_index = 0; step_index < steps.length; step_index++) {
-        if (step_index === steps.length - 1) {
-            let tmp_step = steps[step_index];
-            tmp_step["last"] = true;
-            steps[step_index] = tmp_step;
-        }
-        else {
-            let tmp_step = steps[step_index];
-            tmp_step["next_type"] = steps[step_index + 1]["type"];
-            steps[step_index] = tmp_step;
-        }
-    }
-    return steps;
-}
-
-function setValueFromPath(context, step, value) {
-    if (step.last) {
-        context[step.key] = value;
-    }
-
-    //TODO: make merge functionality and file suport.
-
-    //check if the context value already exists
-    if (context[step.key] === undefined) {
-        if (step.type === "object") {
-            if (step.next_type === "object") {
-                context[step.key] = {};
-                return context[step.key];
+      }
+    },
+  
+    /**
+     * Converts a form input value to the appropriate data type.
+     *
+     * @param {Object|String} value - The element values
+     * @param {String} inputType - The type of the input element (e.g., "number", "checkbox").
+     * @returns {Object|Number|Boolean} The converted value.
+     * @returns void
+     */
+    _convertValue: function(value, inputType) {
+      if (inputType == 'number' || inputType == 'range') {
+        return Array.isArray(value) ? value.map(Number) : Number(value);
+      } else if (inputType === 'checkbox') {
+        return value === 'on';
+      }
+      return value;
+    },
+  
+    /**
+     * Converts flagged objects into arrays where applicable.
+     *
+     * If an object contains the this._flagArray property, it is converted to an array
+     * with the appropriate size based on the maximum index in the object.
+     *
+     * @param {Object} obj - The object to process.
+     * @returns void
+     */
+    _clearFlagArray: function(obj) {
+      for (const key in obj) {
+        const current = obj[key]
+  
+        if (typeof current === 'object' && current !== null) {
+          if (current.hasOwnProperty(this._flagArray)) {
+            delete(current[this._flagArray])
+  
+            const length = Math.max(...Object.keys(current)) + 1;
+            const arr = new Array(length);
+  
+            for (const i in current) {
+              arr[i] = current[i]
+              this._clearFlagArray(current[i])
             }
-            if (step.next_type === "array") {
-                context[step.key] = [];
-                return context[step.key];
-            }
+  
+            obj[key] = arr
+          } else {
+            // call the function recursively for nested object
+            this._clearFlagArray(obj[key]);
+          }
         }
-        if (step.type === "array") {
-            if (step.next_type === "object") {
-                context[step.key] = {};
-                return context[step.key];
-            }
-            if (step.next_type === "array") {
-                context[step.key] = [];
-                return context[step.key];
-            }
-        }
+      }
     }
-    else {
-        return context[step.key];
-    }
-}
+  });

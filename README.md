@@ -20,9 +20,10 @@ EXAMPLE 1: Basic Keys
 {
   "name":   "Bender",
   "hind":   "Bitable",
-  "shiny":  "on"
+  "shiny":  true
 }
 ```
+
 ```html
 EXAMPLE 2: Multiple Values
 <form hx-ext='json-enc-custom'>
@@ -33,14 +34,15 @@ EXAMPLE 2: Multiple Values
 
 // produces
 {
-  "bottle-on-wall":   ["1", "2", "3"]
+  "bottle-on-wall":   [1, 2, 3]
 }
 ```
 ```html
 EXAMPLE 3: Deeper Structure
+Support Array and Object (index split by [] or dot)
 <form hx-ext='json-enc-custom'>
   <input name='pet[species]' value='Dahut'>
-  <input name='pet[name]' value='Hypatia'>
+  <input name='pet.name' value='Hypatia'>
   <input name='kids[1]' value='Thelma'>
   <input name='kids[0]' value='Ashley'>
 </form>
@@ -58,16 +60,32 @@ EXAMPLE 3: Deeper Structure
 EXAMPLE 4: Sparse Arrays
 <form hx-ext='json-enc-custom'>
   <input name='hearbeat[0]' value='thunk'>
-  <input name='hearbeat[2]' value='thunk'>
+  <input name='hearbeat[3]' value='thunk'>
 </form>
 
 // produces
 {
-    "hearbeat":   ["thunk", null, "thunk"]
+    "hearbeat":   ["thunk", null, null, "thunk"]
 }
 ```
 ```html
-EXAMPLE 5: Even Deeper
+EXAMPLE 5: return boolean for Checkbox by attribute "jec-boolean-checkbox"
+<form hx-ext='json-enc-custom' ignore-parse-types >
+  <input name='name' value='Bender'>
+  <input name='age' type="number" value='18'>
+  <input type='checkbox' name='shiny' checked>
+</form>
+
+// produces
+{
+  "name":   "Bender",
+  "age":    "18",
+  "shiny":  "on"
+}
+```
+
+```html
+EXAMPLE 6: Even Deeper
 <form hx-ext='json-enc-custom'>
   <input name='pet[0][species]' value='Dahut'>
   <input name='pet[0][name]' value='Hypatia'>
@@ -90,9 +108,10 @@ EXAMPLE 5: Even Deeper
 }
 ```
 ```html
-EXAMPLE 6: Such Deep
+EXAMPLE 7: Such Deep
 <form hx-ext='json-enc-custom'>
   <input name='wow[such][deep][3][much][power][!]' value='Amaze'>
+  <input name='wow.such.deep.3.much.power.dot' value='Amaze-Dot'>
 </form>
 
 // produces
@@ -106,7 +125,8 @@ EXAMPLE 6: Such Deep
                 {
                     "much": {
                         "power": {
-                            "!":  "Amaze"
+                            "!":   "Amaze",
+                            "dot": "Dot-Amaze",
                         }
                     }
                 }
@@ -116,7 +136,7 @@ EXAMPLE 6: Such Deep
 }
 ```
 ```html
-EXAMPLE 10: Bad input
+EXAMPLE 8: Bad input
 <form hx-ext='json-enc-custom'>
   <input name='error[good]' value='BOOM!'>
   <input name='error[bad' value='BOOM BOOM!'>
