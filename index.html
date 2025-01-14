@@ -11,9 +11,11 @@
 
 <body>
     <!-- This is a form example -->
-    <form id="test-form" hx-ext="json-enc-custom" hx-post="/" style="display: flex; flex-direction: column;">
-        <input name='index[0]' value='somevalue'>
-        <input name='index[1]' value='someothervalue'>
+    <form id="test-form" hx-ext="json-enc-custom" hx-post="/" parse-types="true" style="display: flex; flex-direction: column;">
+        <input name='index' type="number" value='15.7'>
+        <input name='index' type="text" value='25'>
+        <input name="index" type="range">
+        <input name='index' type='checkbox'>
         <button type="submit">Enviar</button>
     </form>
 </body>
