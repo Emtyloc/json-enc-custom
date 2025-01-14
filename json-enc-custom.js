@@ -11,12 +11,12 @@
         },
         encodeParameters: function (xhr, parameters, elt) {
             xhr.overrideMimeType('text/json');
-            let encoded_parameters = encodingAlgorithm(parameters);
+            let encoded_parameters = encodingAlgorithm(parameters, elt);
             return encoded_parameters;
         }
     });
 
-    function encodingAlgorithm(parameters) {
+    function encodingAlgorithm(parameters, elt) {
         let resultingObject = Object.create(null);
         const PARAM_NAMES = Object.keys(parameters);
         const PARAM_VALUES = Object.values(parameters);
@@ -25,6 +25,12 @@
         for (let param_index = 0; param_index < PARAM_LENGHT; param_index++) {
             let name = PARAM_NAMES[param_index];
             let value = PARAM_VALUES[param_index];
+
+            let parse_value = api.getAttributeValue(elt, "parse-types");
+            if (parse_value === "true" ) {
+                value = parseValues(elt, name, value);
+            }
+
             let steps = JSONEncodingPath(name);
             let context = resultingObject;
 
@@ -36,6 +42,29 @@
 
         let result = JSON.stringify(resultingObject);
         return result
+    }
+
+    function parseValues(elt, name, value) {
+        const elements = elt.querySelectorAll(`[name="${name}"]`);
+
+        if (!Array.isArray(value)) return parseElementValue(elements[0], value);
+        
+        for (let index = 0; index < value.length; index++) {
+            let array_elt = elements[index];
+            let array_value = value[index];
+            value[index] = parseElementValue(array_elt, array_value);
+        }
+        return value;
+    }
+
+    function parseElementValue(elt, value) {
+        if (elt && elt.type === "checkbox") {
+            return elt.checked;
+        }
+        if (elt && (elt.type === "number" || elt.type === "range")) {
+            return Number(value);
+        }
+        return value;
     }
 
     function JSONEncodingPath(name) {

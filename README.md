@@ -5,9 +5,12 @@ This is a [custom extension](https://github.com/bigskysoftware/htmx-extensions/t
 <script src="https://cdn.jsdelivr.net/gh/Emtyloc/json-enc-custom@main/json-enc-custom.js"></script>
 ```
 ## Examples
+
+By default, the JSON sent uses the browser's form-encoding convention, which means everything is sent as a string. If you want to send parsed data, such as numbers or booleans for checkboxes, use `parse-types="true"`. (The parsing applies for inputs of type `checkbox`, `number`, `range`).
+
 ```html
 EXAMPLE 1: Basic Keys
-<form hx-ext='json-enc-custom'>
+<form hx-ext='json-enc-custom' parse-types="false">
   <input name='name' value='Bender'>
   <select name='hind'>
     <option selected>Bitable</option>
@@ -22,16 +25,28 @@ EXAMPLE 1: Basic Keys
   "hind":   "Bitable",
   "shiny":  "on"
 }
+// parse-types="true"
+{
+  "name":   "Bender",
+  "hind":   "Bitable",
+  "shiny":  true   
+}
+
+NOTES: Unchecked inputs are ignored; this is due to how HTMX and browsers behave.
 ```
 ```html
 EXAMPLE 2: Multiple Values
-<form hx-ext='json-enc-custom'>
+<form hx-ext='json-enc-custom' parse-types="true">
   <input type='number' name='bottle-on-wall' value='1'>
   <input type='number' name='bottle-on-wall' value='2'>
   <input type='number' name='bottle-on-wall' value='3'>
 </form>
 
 // produces
+{
+  "bottle-on-wall":   [1, 2, 3]
+}
+// parse-types="false", with other value or absent
 {
   "bottle-on-wall":   ["1", "2", "3"]
 }
