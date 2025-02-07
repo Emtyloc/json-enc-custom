@@ -6,7 +6,7 @@ This is a [custom extension](https://github.com/bigskysoftware/htmx-extensions/t
 ```
 ## Examples
 
-By default, the JSON sent uses the browser's form-encoding convention, which means everything is sent as a string. If you want to send parsed data, such as numbers or booleans for checkboxes, use `parse-types="true"`. (The parsing applies for inputs of type `checkbox`, `number`, `range`).
+By default, the JSON sent uses the browser's form-encoding convention, which means everything is sent as a string. If you want to send parsed data, such as numbers or booleans for checkboxes, use `parse-types="true"`. (The parsing applies for inputs of type `checkbox`, `number`, `range`, `select`).
 
 ```html
 EXAMPLE 1: Basic Keys
