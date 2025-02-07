@@ -20,9 +20,9 @@
         let resultingObject = Object.create(null);
         const PARAM_NAMES = Object.keys(parameters);
         const PARAM_VALUES = Object.values(parameters);
-        const PARAM_LENGHT = PARAM_NAMES.length;
+        const PARAM_LENGTH = PARAM_NAMES.length;
 
-        for (let param_index = 0; param_index < PARAM_LENGHT; param_index++) {
+        for (let param_index = 0; param_index < PARAM_LENGTH; param_index++) {
             let name = PARAM_NAMES[param_index];
             let value = PARAM_VALUES[param_index];
 
@@ -58,11 +58,13 @@
     }
 
     function parseElementValue(elt, value) {
-        if (elt && elt.type === "checkbox") {
-            return elt.checked;
-        }
-        if (elt && (elt.type === "number" || elt.type === "range")) {
-            return Number(value);
+        if (elt) {
+            if (elt.type === "checkbox") {
+                return elt.checked;
+            }
+            if (elt.type === "number" || elt.type === "range" || elt.type === "select-one" || elt.type === "select-multiple") {
+                return Number(value);
+            }
         }
         return value;
     }

@@ -130,6 +130,22 @@ EXAMPLE 6: Such Deep
     }
 }
 ```
+
+```html
+EXAMPLE 7: Number parsing on select 
+<form hx-ext='json-enc-custom'>
+  <select name="roles[0]" type="number">
+    <option value="1" selected>Role 1</option>
+    <option value="2">Role 2</option>
+  </select>
+</form>
+
+// Produces:
+{
+  "roles": [1]
+}
+```
+
 ```html
 EXAMPLE 10: Bad input
 <form hx-ext='json-enc-custom'>
