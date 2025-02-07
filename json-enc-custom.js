@@ -58,11 +58,13 @@
     }
 
     function parseElementValue(elt, value) {
-        if (elt && elt.type === "checkbox") {
-            return elt.checked;
-        }
-        if (elt && (elt.type === "number" || elt.type === "range")) {
-            return Number(value);
+        if (elt) {
+            if (elt.type === "checkbox") {
+                return elt.checked;
+            }
+            if (elt.type === "number" || elt.type === "range" || elt.type === "select-one" || elt.type === "select-multiple") {
+                return Number(value);
+            }
         }
         return value;
     }
