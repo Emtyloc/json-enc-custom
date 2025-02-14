@@ -11,12 +11,24 @@
         },
         encodeParameters: function (xhr, parameters, elt) {
             xhr.overrideMimeType('text/json');
-            let encoded_parameters = encodingAlgorithm(parameters, elt);
+
+            let includedSelector = api.getClosestAttributeValue(elt, "hx-include");
+            let includedElt;
+
+            if (includedSelector) {
+                // "hx-include" can be inherited so `elt` will not always be the root element
+                let eltWithInclude = api.getClosestMatch(elt, function(e) {
+                  return e.matches(`[hx-include="${includedSelector}"]`);
+                })
+                includedElt = api.querySelectorExt(eltWithInclude, includedSelector)
+            }
+
+            let encoded_parameters = encodingAlgorithm(parameters, elt, includedElt);
             return encoded_parameters;
         }
     });
 
-    function encodingAlgorithm(parameters, elt) {
+    function encodingAlgorithm(parameters, elt, includedElt) {
         let resultingObject = Object.create(null);
         const PARAM_NAMES = Object.keys(parameters);
         const PARAM_VALUES = Object.values(parameters);
@@ -28,7 +40,7 @@
 
             let parse_value = api.getAttributeValue(elt, "parse-types");
             if (parse_value === "true" ) {
-                value = parseValues(elt, name, value);
+                value = parseValues(elt, includedElt, name, value);
             }
 
             let steps = JSONEncodingPath(name);
@@ -44,8 +56,20 @@
         return result
     }
 
-    function parseValues(elt, name, value) {
-        const elements = elt.querySelectorAll(`[name="${name}"]`);
+    function parseValues(elt, includedElt, name, value) {
+        let match = `[name="${name}"]`;
+
+        let elements = elt.querySelectorAll(match);;
+
+
+        if (!elements.length && includedElt !== undefined) {
+            // "hx-include" allows CSS query selectors which may return an specific node, e.g a single input
+            if (includedElt.matches(match)) {
+                elements = [includedElt]
+            } else {
+                elements = includedElt.querySelectorAll(match);
+            }
+        }
 
         if (!Array.isArray(value)) return parseElementValue(elements[0], value);
         
