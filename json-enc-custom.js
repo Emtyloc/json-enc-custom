@@ -12,18 +12,10 @@
         encodeParameters: function (xhr, parameters, elt) {
             xhr.overrideMimeType('text/json');
 
-            let includedSelector = api.getClosestAttributeValue(elt, "hx-include");
-            let includedElt;
-
-            if (includedSelector) {
-                // "hx-include" can be inherited so `elt` will not always be the root element
-                let eltWithInclude = api.getClosestMatch(elt, function(e) {
-                  return e.matches(`[hx-include="${includedSelector}"]`);
-                })
-                includedElt = api.querySelectorExt(eltWithInclude, includedSelector)
-            }
+            let includedElt = getIncludedElement(elt);
 
             let encoded_parameters = encodingAlgorithm(parameters, elt, includedElt);
+
             return encoded_parameters;
         }
     });
@@ -176,6 +168,19 @@
         }
         else {
             return context[step.key];
+        }
+    }
+
+    function getIncludedElement(elt) {
+        let includedSelector = api.getClosestAttributeValue(elt, "hx-include");
+
+        if (includedSelector) {
+            // "hx-include" can be inherited so `elt` will not always be the root element
+            let eltWithInclude = api.getClosestMatch(elt, function(e) {
+              return e.matches(`[hx-include="${includedSelector}"]`);
+            })
+
+            return api.querySelectorExt(eltWithInclude, includedSelector)
         }
     }
 })()
