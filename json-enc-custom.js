@@ -4,11 +4,23 @@
         init: function (apiRef) {
             api = apiRef
         },
+        /**
+         * Register a handler for all htmx events.
+         * @param {string} name Event name
+         * @param {Event|CustomEvent} evt Event object
+         */
         onEvent: function (name, evt) {
             if (name === "htmx:configRequest") {
                 evt.detail.headers['Content-Type'] = "application/json";
             }
         },
+        /**
+         * Takes FormData specified by the user and returns an encoded string.
+         * @param {XMLHttpRequest} xhr Request object to send to the server
+         * @param {FormData} parameters Raw form data
+         * @param {Node} elt Node that owns the request
+         * @returns *|string|null
+         */
         encodeParameters: function (xhr, parameters, elt) {
             xhr.overrideMimeType('text/json');
 
@@ -20,6 +32,13 @@
         }
     });
 
+    /**
+     * Merge form data and hx-include data and encode to a JSON string. Apply type parsing if requested.
+     * @param {FormData} parameters Raw form data as provided by the user
+     * @param {Node} elt Node that owns the request
+     * @param {NodeList} includedElt Other elements that shall be considered for this request (hx-include)
+     * @returns *|string|null
+     */
     function encodingAlgorithm(parameters, elt, includedElt) {
         let resultingObject = Object.create(null);
         const PARAM_NAMES = Object.keys(parameters);
@@ -48,6 +67,14 @@
         return result
     }
 
+    /**
+     * Parse the value of one FormData parameter
+     * @param {Node} elt Node that owns the request
+     * @param {NodeList} includedElt Other elements that shall be considered for this request (hx-include)
+     * @param {string} name Parameter name
+     * @param {*} value Parameter value
+     * @returns Parsed values with correct types
+     */
     function parseValues(elt, includedElt, name, value) {
         let match = `[name="${name}"]`;
 
@@ -73,6 +100,12 @@
         return value;
     }
 
+    /**
+     * Parse value based on element type. Deals with special handling for checkbox, number, range, select-one, and select-multiple.
+     * @param {Node} elt Element owning the parameter
+     * @param {*} value Parameter value that shall be parsed
+     * @returns Parsed value with correct type
+     */
     function parseElementValue(elt, value) {
         if (elt) {
             if (elt.type === "checkbox") {
@@ -85,6 +118,11 @@
         return value;
     }
 
+    /**
+     * Parse the parameter name to assess the nesting level needed for construcing the JSON
+     * @param {string} name Parameter name
+     * @returns {Array} List of nesting instructions
+     */
     function JSONEncodingPath(name) {
         let path = name;
         let original = path;
@@ -136,6 +174,13 @@
         return steps;
     }
 
+    /**
+     * Construct the nested object according to the step instrtuctions
+     * @param {Object} context Container processed FormData parameters
+     * @param {Object} step Nesting instructions for the parameter
+     * @param {*} value Parameter value
+     * @returns 
+     */
     function setValueFromPath(context, step, value) {
         if (step.last) {
             context[step.key] = value;
@@ -171,6 +216,11 @@
         }
     }
 
+    /**
+     * Collect all nodes specified in `hx-include`
+     * @param {Node} elt Node owning the request
+     * @returns List of extra nodes with parameters to include in this request
+     */
     function getIncludedElement(elt) {
         let includedSelector = api.getClosestAttributeValue(elt, "hx-include");
 
