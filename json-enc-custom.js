@@ -5,7 +5,7 @@
             api = apiRef
         },
         /**
-         * Register a handler for all htmx events.
+         * Register a handler for all htmx events. Override the request Content-Type to `application/json` 
          * @param {string} name Event name
          * @param {Event|CustomEvent} evt Event object
          */
@@ -78,8 +78,7 @@
     function parseValues(elt, includedElt, name, value) {
         let match = `[name="${name}"]`;
 
-        let elements = elt.querySelectorAll(match);;
-
+        let elements = elt.closest('form').querySelectorAll(match); // find the closest owning form and use this as the root element for finding matches
 
         if (!elements.length && includedElt !== undefined) {
             // "hx-include" allows CSS query selectors which may return an specific node, e.g a single input
