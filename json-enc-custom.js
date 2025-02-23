@@ -12,9 +12,7 @@
         encodeParameters: function (xhr, parameters, elt) {
             xhr.overrideMimeType('text/json');
 
-            let includedElt = getIncludedElement(elt);
-
-            let encoded_parameters = encodingAlgorithm(parameters, elt, includedElt);
+            let encoded_parameters = encodingAlgorithm(parameters, elt);
 
             return encoded_parameters;
         }
@@ -32,6 +30,7 @@
 
             let parse_value = api.getAttributeValue(elt, "parse-types");
             if (parse_value === "true" ) {
+                let includedElt = getIncludedElement(elt);
                 value = parseValues(elt, includedElt, name, value);
             }
 
