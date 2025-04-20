@@ -63,6 +63,23 @@
 
         if (!Array.isArray(value)) return parseElementValue(elements[0], value);
         
+        if (
+            elements.length === 1 &&
+            elements[0] instanceof HTMLSelectElement &&
+            elements[0].type === "select-multiple"
+        ) {
+            const elt = elements[0];
+            const convertToNumber = checkAllPossibleOptionsAreNumbers(elt);
+            for (let index = 0; index < value.length; index++) {
+                let arrayValue = value[index]
+                if (convertToNumber) {
+                    arrayValue = Number(arrayValue);
+                }
+                value[index] = parseElementValue(elt, arrayValue);
+            }
+            return value;
+        }
+
         for (let index = 0; index < value.length; index++) {
             let array_elt = elements[index];
             let array_value = value[index];
@@ -72,15 +89,36 @@
     }
 
     function parseElementValue(elt, value) {
-        if (elt) {
-            if (elt.type === "checkbox") {
+        switch (true) {
+        case elt instanceof HTMLInputElement:
+            switch (elt.type) {
+            case "checkbox":
                 return elt.checked;
-            }
-            if (elt.type === "number" || elt.type === "range" || elt.type === "select-one" || elt.type === "select-multiple") {
+            case "number":
+            case "range": 
                 return Number(value);
             }
-        }
+            break;
+        case elt instanceof HTMLSelectElement:
+            if (elt.type === "select-one" && checkAllPossibleOptionsAreNumbers(elt)) {
+                return Number(value);
+            }
+            break;
+        }        
         return value;
+    }
+
+    function checkAllPossibleOptionsAreNumbers(elt) {
+        const values = [...elt.options].map(o => o.value);
+        if (values.length == 0) {
+            return true;
+        }
+        for (const value of values) {
+            if (isNaN(Number(value))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     function JSONEncodingPath(name) {

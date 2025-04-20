@@ -13,19 +13,62 @@
     <!-- This is a form example -->
     <h1>HX-POST in form</h1>
     <form id="test-form" hx-ext="json-enc-custom" hx-post="/" parse-types="true" style="display: flex; flex-direction: column;">
-        <input name='index' type="number" value='15.7'>
-        <input name='index' type="text" value='25'>
+        <input name="index" type="number" value="15.7">
+        <input name="index" type="text" value="25">
         <input name="index" type="range">
-        <input name='index' type='checkbox'>
+        <input name="index" type="checkbox">
         <button type="submit">Enviar</button>
     </form>
 
     <h1>HX-POST in button</h1>
     <form id="test-form" hx-ext="json-enc-custom" style="display: flex; flex-direction: column;">
-        <input name='index' type="number" value='15.7'>
-        <input name='index' type="text" value='25'>
+        <input name="index" type="number" value="15.7">
+        <input name="index" type="text" value="25">
         <input name="index" type="range">
-        <input name='index' type='checkbox'>
+        <input name="index" type="checkbox">
         <button type="submit" hx-post="/" parse-types="true">Enviar</button>
+    </form>
+
+    <h1>All possible tags in form</h1> <!-- https://www.w3schools.com/tags/tag_form.asp -->
+    <form 
+        hx-ext="json-enc-custom" 
+        hx-post="/" 
+        parse-types="true"
+        style="display: flex; flex-direction: column;"
+    >
+        <fieldset style="display: flex; flex-direction: column;">
+            <input name="number" type="number" value="15.7">
+            <input name="text" type="text" value="25">
+            <input name="range" type="range">
+            <input name="checkbox" type="checkbox">
+            <input name="unknown">
+        </fieldset>
+        <textarea name="textarea">Example text</textarea>
+        <select name="select-one-combined">
+            <optgroup label="String options">
+                <option value="first">First</option>
+                <option value="second">Second</option>
+            </optgroup>
+            <optgroup label="Number options">
+                <option value="10">10</option>
+                <option value="3.14">3.14</option>
+            </optgroup>
+        </select>
+        <select name="select-one-numbers">
+            <option value="10">10</option>
+            <option value="3.14">3.14</option>
+        </select>
+        <select name="select-multiple-combined" multiple>
+            <option value="multiple-1">multiple-1</option>
+            <option value="multiple-2">multiple-2</option>
+            <option value="3">3</option>
+        </select>
+        <select name="select-multiple-numbers" multiple>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+        </select>
+
+        <button type="submit">Enviar</button>
     </form>
 </body>
