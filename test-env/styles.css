@@ -1,0 +1,39 @@
+* {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid black;
+    padding: 8px;
+    text-align: left;
+}
+
+.pass {
+    background-color: #ccffcc;
+}
+
+.fail {
+    background-color: #ffcccc;
+}
+
+.diff-added {
+    white-space: pre;
+    background-color: #ccffcc;
+}
+
+.diff-removed {
+    white-space: pre;
+    background-color: #ffcccc;
+}
+
+#test-results-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 20px;
+}

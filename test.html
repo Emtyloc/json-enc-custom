@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Tests</title>
+
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+    <script src="json-enc-custom.js"></script>
+
+    <script src="test-env/test-env.js"></script>
+    <link rel="stylesheet" href="test-env/styles.css">
+</head>
+<body>
+    <table>
+        <thead>
+            <tr>
+                <th>№</th>
+                <th>Test Case</th>
+                <th>Expected Result</th>
+                <th>Actual Result</th>
+                <th>Diff</th>
+            </tr>
+        </thead>
+        <tbody id="test-cases"></tbody>
+    </table>
+    <div id="test-results-container">
+        <h2 id="test-results"></h2>
+    </div>
+    <script>
+        // EXAMPLE 1 from https://www.w3.org/TR/html-json-forms/
+        addTestCase(
+            `
+            <form hx-ext="json-enc-custom" hx-post="/" parse-types="true">
+                <input name="name" value="Bender">
+                <select name="hind">
+                    <option selected>Bitable</option>
+                    <option>Kickable</option>
+                </select>
+                <input type="checkbox" name="shiny" checked>
+            </form>
+            `,
+            `{"name":"Bender","hind":"Bitable","shiny":true}`
+        );
+
+        // EXAMPLE 2 from https://www.w3.org/TR/html-json-forms/
+        addTestCase(
+            `
+            <form hx-ext="json-enc-custom" hx-post="/" parse-types="true">
+                <input type="number" name="bottle-on-wall" value="1">
+                <input type="number" name="bottle-on-wall" value="2">
+                <input type="number" name="bottle-on-wall" value="3">
+            </form>
+            `,
+            `{"bottle-on-wall":[1,2,3]}`,
+        );
+
+        // EXAMPLE 3 from https://www.w3.org/TR/html-json-forms/
+        addTestCase(
+            `
+            <form hx-ext="json-enc-custom" hx-post="/" parse-types="true">
+                <input name="pet[species]" value="Dahut">
+                <input name="pet[name]" value="Hypatia">
+                <input name="kids[1]" value="Thelma">
+                <input name="kids[0]" value="Ashley">
+            </form>
+            `,
+            `{"pet":{"species":"Dahut","name":"Hypatia"},"kids":["Ashley","Thelma"]}`,
+        );
+
+        // EXAMPLE 4 from https://www.w3.org/TR/html-json-forms/
+        addTestCase(
+            `
+            <form hx-ext="json-enc-custom" hx-post="/" parse-types="true">
+                <input name="hearbeat[0]" value="thunk">
+                <input name="hearbeat[2]" value="thunk">
+            </form>
+            `,
+            `{"hearbeat":["thunk",null,"thunk"]}`,
+        );
+
+        // EXAMPLE 5 from https://www.w3.org/TR/html-json-forms/
+        addTestCase(
+            `
+            <form hx-ext="json-enc-custom" hx-post="/" parse-types="true">
+                <input name="pet[0][species]" value="Dahut">
+                <input name="pet[0][name]" value="Hypatia">
+                <input name="pet[1][species]" value="Felis Stultus">
+                <input name="pet[1][name]" value="Billie">
+            </form>
+            `,
+            `{"pet":[{"species":"Dahut","name":"Hypatia"},{"species":"Felis Stultus","name":"Billie"}]}`
+        );
+
+        // EXAMPLE 6 from https://www.w3.org/TR/html-json-forms/
+        addTestCase(
+            `
+            <form hx-ext="json-enc-custom" hx-post="/" parse-types="true">
+                <input name="wow[such][deep][3][much][power][!]" value="Amaze">
+            </form>
+            `,
+            `{"wow":{"such":{"deep":[null,null,null,{"much":{"power":{"!":"Amaze"}}}]}}}`
+        );
+
+        // EXAMPLE 7 from https://www.w3.org/TR/html-json-forms/
+        addTestCase(
+            `
+            <form hx-ext="json-enc-custom" hx-post="/" parse-types="true">
+                <input name="mix" value="scalar">
+                <input name="mix[0]" value="array 1">
+                <input name="mix[2]" value="array 2">
+                <input name="mix[key]" value="key key">
+                <input name="mix[car]" value="car key">
+            </form>
+            `,
+            `{"mix":{"":"scalar","0":"array 1","2":"array 2","key":"key key","car":"car key"}}`
+        );
+
+        // EXAMPLE 8 from https://www.w3.org/TR/html-json-forms/
+        addTestCase(
+            `
+            <form hx-ext="json-enc-custom" hx-post="/" parse-types="true">
+                <input name="highlander[]" value="one">
+            </form>
+            `,
+            `{"highlander":["one"]}`
+        );
+
+        // EXAMPLE 9 from https://www.w3.org/TR/html-json-forms/
+        // is not included because it contains a file input
+        // may be included in later version (but now it makes no sense)
+
+        // EXAMPLE 10 from https://www.w3.org/TR/html-json-forms/
+        addTestCase(
+            `
+            <form hx-ext="json-enc-custom" hx-post="/" parse-types="true">
+                <input name="error[good]" value="BOOM!">
+                <input name="error[bad" value="BOOM BOOM!">
+            </form>
+            `,
+            `{"error":{"good":"BOOM!"},"error[bad":"BOOM BOOM!"}`
+        );
+    </script>
+</body>
+</html>
