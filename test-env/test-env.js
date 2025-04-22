@@ -7,11 +7,17 @@ const waitForRequestToHappenTimeout = 50; // milliseconds
 const waitForAllTestsToComplete = 250; // milliseconds
 let lastTestIndex = 0; // last test case index (changed when new test cases are added)
 
-function addTestCase(testCase, expectedResult) {
+function addTestCase(testCaseKey, testCase, expectedResult) {
     lastTestIndex++;
+    if (testCaseKey != lastTestIndex) {
+        throw new Error(`Test case key doesn't match test case index: ${testCaseKey} != ${lastTestIndex}`);
+    }
+
     const testCases = document.getElementById('test-cases');
     const newTestCase = document.createElement('tr');
     newTestCase.id = `test-case-${lastTestIndex}`;
+
+    expectedResult = JSON.stringify(JSON.parse(expectedResult)) // minifies json
     newTestCase.innerHTML = `
         <th>${lastTestIndex}</th>
         <th>
@@ -21,6 +27,7 @@ function addTestCase(testCase, expectedResult) {
         <th></th>
         <th></th>
     `;
+
     newTestCase.children[formIndex].querySelector("form").setAttribute("hx-target", `#test-case-${lastTestIndex}`)
     testCases.appendChild(newTestCase);
 }
