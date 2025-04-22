@@ -482,8 +482,18 @@
             },
         };
 
+        const urlParams = new URLSearchParams(window.location.search);
+        const isolateTestKey = urlParams.get("isolate-test");
+
         Object.keys(testCases).forEach(function(testCaseKey) {
             const testCase = testCases[testCaseKey];
+            if (isolateTestKey !== null) {
+                if (testCaseKey == isolateTestKey) {
+                    testCaseKey = "1";
+                } else {
+                    return;
+                }
+            }
             addTestCase(testCaseKey, testCase.form, testCase.expected);
         });
     </script>

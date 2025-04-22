@@ -1,11 +1,16 @@
 # json-enc-custom
-This is a [custom extension](https://github.com/bigskysoftware/htmx-extensions/tree/main?tab=readme-ov-file#defining-an-extension) for htmx, it takes the parameters from encodeParameters, and parse the names of the forms like the examples below:
+
+This is a [custom extension](https://github.com/bigskysoftware/htmx-extensions/tree/main?tab=readme-ov-file#defining-an-extension) for [htmx](https://htmx.org/), it takes the parameters from `encodeParameters`, and parse the names of the forms like the examples below.
+Reference: [W3C HTML JSON form submission](https://www.w3.org/TR/html-json-forms/).
+
 ## Install
+
 ```html
 <script src="https://cdn.jsdelivr.net/gh/Emtyloc/json-enc-custom@main/json-enc-custom.js"></script>
 <!-- Pointing to release (More production-safe) -->
 <script src="https://cdn.jsdelivr.net/gh/Emtyloc/json-enc-custom@v0.1.0/json-enc-custom.js"></script>
 ```
+
 ## Examples
 
 By default, the JSON sent uses the browser's form-encoding convention, which means everything is sent as a string. If you want to send parsed data, such as numbers or booleans for checkboxes, use `parse-types="true"`. (The parsing applies for inputs of type `checkbox`, `number`, `range`, `select`).
@@ -71,6 +76,7 @@ EXAMPLE 3: Deeper Structure
     "kids":   ["Ashley", "Thelma"]
 }
 ```
+
 ```html
 EXAMPLE 4: Sparse Arrays
 <form hx-ext='json-enc-custom'>
@@ -83,6 +89,7 @@ EXAMPLE 4: Sparse Arrays
     "hearbeat":   ["thunk", null, "thunk"]
 }
 ```
+
 ```html
 EXAMPLE 5: Even Deeper
 <form hx-ext='json-enc-custom'>
@@ -106,6 +113,7 @@ EXAMPLE 5: Even Deeper
     ]
 }
 ```
+
 ```html
 EXAMPLE 6: Such Deep
 <form hx-ext='json-enc-custom'>
@@ -163,6 +171,14 @@ EXAMPLE 10: Bad input
     "error[bad":  "BOOM BOOM!"
 }
 ```
-references: https://www.w3.org/TR/html-json-forms/
 
+## Testing
 
+To run the tests, simply open `test.html` in your browser.
+
+The tests function by automatically submitting a form from each test case. The resulting HTTP request that HTMX generates is then intercepted and compared against an expected request.
+
+**Isolating a Specific Test Case (Debugging):**
+
+For debugging purposes, you can isolate a specific test case. To do this, add the `isolate-test` query parameter equal to the number of test case you want to isolate.
+For example: `http://127.0.0.1:5500/test.html?isolate-test=13`
