@@ -3,6 +3,8 @@ This is a [custom extension](https://github.com/bigskysoftware/htmx-extensions/t
 ## Install
 ```html
 <script src="https://cdn.jsdelivr.net/gh/Emtyloc/json-enc-custom@main/json-enc-custom.js"></script>
+<!-- Pointing to release (More production-safe) -->
+<script src="https://cdn.jsdelivr.net/gh/Emtyloc/json-enc-custom@v0.1.0/json-enc-custom.js"></script>
 ```
 ## Examples
 
