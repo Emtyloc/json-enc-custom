@@ -7,20 +7,30 @@ const waitForRequestToHappenTimeout = 50; // milliseconds
 const waitForAllTestsToComplete = 250; // milliseconds
 let lastTestIndex = 0; // last test case index (changed when new test cases are added)
 
-function addTestCase(testCase, expectedResult) {
+function prettyJSON(jsonString) {
+    return JSON.stringify(JSON.parse(jsonString), null, 4)
+}
+
+function addTestCase(testCaseKey, testCase, expectedResult) {
     lastTestIndex++;
+    if (testCaseKey != lastTestIndex) {
+        throw new Error(`Test case key doesn't match test case index: ${testCaseKey} != ${lastTestIndex}`);
+    }
+
     const testCases = document.getElementById('test-cases');
     const newTestCase = document.createElement('tr');
     newTestCase.id = `test-case-${lastTestIndex}`;
+
     newTestCase.innerHTML = `
         <th>${lastTestIndex}</th>
         <th>
             ${testCase}
         </th>
-        <th>${expectedResult}</th>
+        <th><pre>${prettyJSON(expectedResult)}</pre></th>
         <th></th>
         <th></th>
     `;
+
     newTestCase.children[formIndex].querySelector("form").setAttribute("hx-target", `#test-case-${lastTestIndex}`)
     testCases.appendChild(newTestCase);
 }
@@ -47,7 +57,7 @@ function submitAllForms() {
 }
 
 function setActualResult(testCase, result) {
-    testCase.children[actualResultIndex].innerHTML = result;
+    testCase.children[actualResultIndex].innerHTML = `<pre>${prettyJSON(result)}</pre>`;
 }
 
 function checkTestResult(testCase) {
@@ -56,7 +66,7 @@ function checkTestResult(testCase) {
     const actual = testCase.children[actualResultIndex];
     const diff = testCase.children[diffIndex];
 
-    const diffContent = diffString(expected.innerHTML, actual.innerHTML);
+    const diffContent = diffString(expected.querySelector("pre").innerHTML, actual.querySelector("pre").innerHTML);
     if (diffContent.length === 0) {
         diff.innerHTML = "✅";
         form.classList.add("pass");
