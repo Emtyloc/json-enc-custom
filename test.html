@@ -478,6 +478,36 @@
                     "select-multiple-numbers":["1","2"]
                 }`
             },
+            21: {
+                desc: "select[multiple] with only one option selected",
+                form:
+                `
+                <form hx-ext="json-enc-custom" hx-post="/" parse-types="false">
+                    <select name="select" multiple> 
+                        <option value="1" selected>First</option>
+                        <option value="2">Second</option>
+                        <option value="3">Third</option>
+                    </select>
+                </form>
+                `,
+                expected: `{
+                    "select": ["1"]
+                }`
+            },
+            22: {
+                desc: "name is equal to \"values\"",
+                form:
+                `
+                <form hx-ext="json-enc-custom" hx-post="/" parse-types="false">
+                    <input type="text" name="values" value="abc"></input>
+                    <input type="text" name="value"  value="abc"></input>
+                </form>
+                `,
+                expected: `{
+                    "values": "abc",
+                    "value": "abc"
+                }`
+            },
         };
 
         const urlParams = new URLSearchParams(window.location.search);
