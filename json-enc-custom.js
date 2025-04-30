@@ -28,10 +28,15 @@
             let name = PARAM_NAMES[param_index];
             let value = PARAM_VALUES[param_index];
 
+            const elements = getChildrenByName(elt, name);
+            if (isSelectMultiple(elements) && !Array.isArray(value)) {
+                value = [value]; // force the value of select multiple to be an array
+            }
+
             let parse_value = api.getAttributeValue(elt, "parse-types");
             if (parse_value === "true" ) {
                 let includedElt = getIncludedElement(elt);
-                value = parseValues(elt, includedElt, name, value);
+                value = parseValues(elements, includedElt, value);
             }
 
             let steps = JSONEncodingPath(name);
@@ -47,11 +52,21 @@
         return result
     }
 
-    function parseValues(elt, includedElt, name, value) {
-        let match = `[name="${name}"]`;
+    function getChildrenByName(original, name) {
+        const match = `[name="${name}"]`;
+        // find the closest owning form and use this as the root element for finding matches
+        return original.closest('form').querySelectorAll(match);
+    }
 
-        let elements = elt.closest('form').querySelectorAll(match); // find the closest owning form and use this as the root element for finding matches
+    function isSelectMultiple(elements) {
+        return (
+            elements.length === 1 &&
+            elements[0] instanceof HTMLSelectElement &&
+            elements[0].type === "select-multiple"
+        )   
+    }
 
+    function parseValues(elements, includedElt, value) {
         if (!elements.length && includedElt !== undefined) {
             // "hx-include" allows CSS query selectors which may return an specific node, e.g a single input
             if (includedElt.matches(match)) {
@@ -63,11 +78,7 @@
 
         if (!Array.isArray(value)) return parseElementValue(elements[0], value);
         
-        if (
-            elements.length === 1 &&
-            elements[0] instanceof HTMLSelectElement &&
-            elements[0].type === "select-multiple"
-        ) {
+        if (isSelectMultiple(elements)) {
             const elt = elements[0];
             const convertToNumber = checkAllPossibleOptionsAreNumbers(elt);
             for (let index = 0; index < value.length; index++) {
@@ -135,6 +146,12 @@
         path = path.slice(first_key.length);
         steps.push({ "type": "object", "key": first_key, "last": false, "next_type": null });
         while (path.length) {
+            // []
+            if (path.startsWith("[]")) {
+                path = path.slice(2);
+                steps.push({ "type": "array", "key": 0, "last": false, "next_type": null })
+                continue;
+            }
             // [123...]
             if (/^\[\d+\]/.test(path)) {
                 path = path.slice(1);
