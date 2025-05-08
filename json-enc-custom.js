@@ -127,21 +127,21 @@
 
     function parseElementValue(elt, value) {
         switch (true) {
-            case elt instanceof HTMLInputElement:
-                switch (elt.type) {
-                    case "checkbox":
-                        return elt.checked;
-                    case "number":
-                    case "range":
-                        return Number(value);
-                }
-                break;
-            case elt instanceof HTMLSelectElement:
-                if (elt.type === "select-one" && checkAllPossibleOptionsAreNumbers(elt)) {
-                    return Number(value);
-                }
-                break;
-        }
+        case elt instanceof HTMLInputElement:
+            switch (elt.type) {
+            case "checkbox":
+                return elt.checked;
+            case "number":
+            case "range": 
+                return Number(value);
+            }
+            break;
+        case elt instanceof HTMLSelectElement:
+            if (elt.type === "select-one" && checkAllPossibleOptionsAreNumbers(elt)) {
+                return Number(value);
+            }
+            break;
+        }        
         return value;
     }
 
@@ -255,7 +255,7 @@
 
         if (includedSelector) {
             // "hx-include" can be inherited so `elt` will not always be the root element
-            let eltWithInclude = api.getClosestMatch(elt, function (e) {
+            let eltWithInclude = api.getClosestMatch(elt, function(e) {
                 return e.matches(`[hx-include="${includedSelector}"]`);
             })
 

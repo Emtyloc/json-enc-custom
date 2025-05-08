@@ -60,12 +60,7 @@ function submitAllForms() {
             } else {
                 numberOfFiles = 1;
             }
-            simulateFileUpload(
-                inputTypeFile,
-                `test-case-${index + 1}`,
-                "text/plain",
-                numberOfFiles
-            );
+            simulateFileUpload(inputTypeFile, `test-case-${index + 1}`, "text/plain", numberOfFiles);
         }
         form.requestSubmit();
     })
