@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>Tests</title>
 
@@ -10,8 +11,9 @@
     <script src="json-enc-custom.js"></script>
 
     <script src="test-env/test-env.js"></script>
-    <link rel="stylesheet" href="test-env/styles.css">
+    <link rel="stylesheet" href="test-env/styles.css" />
 </head>
+
 <body>
     <table>
         <thead>
@@ -33,8 +35,7 @@
         const testCases = {
             1: {
                 desc: "Example 1 from specification, parse-types=true",
-                form:
-                `
+                form: `
                 <form hx-ext="json-enc-custom" hx-post="/" parse-types="true">
                     <input name="name" value="Bender">
                     <select name="hind">
@@ -48,12 +49,11 @@
                     "name":"Bender",
                     "hind":"Bitable",
                     "shiny":true
-                }`
+                }`,
             },
             2: {
                 desc: "Example 1 from specification, parse-types=false",
-                form:
-                `
+                form: `
                 <form hx-ext="json-enc-custom" hx-post="/" parse-types="false">
                     <input name="name" value="Bender">
                     <select name="hind">
@@ -67,12 +67,11 @@
                     "name":"Bender",
                     "hind":"Bitable",
                     "shiny":"on"
-                }`
+                }`,
             },
             3: {
                 desc: "Example 2 from specification, parse-types=true",
-                form:
-                `
+                form: `
                 <form hx-ext="json-enc-custom" hx-post="/" parse-types="true">
                     <input type="number" name="bottle-on-wall" value="1">
                     <input type="number" name="bottle-on-wall" value="2">
@@ -81,12 +80,11 @@
                 `,
                 expected: `{
                     "bottle-on-wall":[1,2,3]
-                }`
+                }`,
             },
             4: {
                 desc: "Example 2 from specification, parse-types=false",
-                form:
-                `
+                form: `
                 <form hx-ext="json-enc-custom" hx-post="/" parse-types="false">
                     <input type="number" name="bottle-on-wall" value="1">
                     <input type="number" name="bottle-on-wall" value="2">
@@ -95,12 +93,11 @@
                 `,
                 expected: `{
                     "bottle-on-wall":["1","2","3"]
-                }`
+                }`,
             },
             5: {
                 desc: "Example 3 from specification, parse-types=true",
-                form:
-                `
+                form: `
                     <form hx-ext="json-enc-custom" hx-post="/" parse-types="true">
                         <input name="pet[species]" value="Dahut">
                         <input name="pet[name]" value="Hypatia">
@@ -117,12 +114,11 @@
                         "Ashley",
                         "Thelma"
                     ]
-                }`
+                }`,
             },
             6: {
                 desc: "Example 3 from specification, parse-types=false",
-                form:
-                `
+                form: `
                     <form hx-ext="json-enc-custom" hx-post="/" parse-types="false">
                         <input name="pet[species]" value="Dahut">
                         <input name="pet[name]" value="Hypatia">
@@ -139,12 +135,11 @@
                         "Ashley",
                         "Thelma"
                     ]
-                }`
+                }`,
             },
             7: {
                 desc: "Example 4 from specification, parse-types=true",
-                form:
-                `
+                form: `
                 <form hx-ext="json-enc-custom" hx-post="/" parse-types="true">
                     <input name="hearbeat[0]" value="thunk">
                     <input name="hearbeat[2]" value="thunk">
@@ -152,12 +147,11 @@
                 `,
                 expected: `{
                     "hearbeat":["thunk",null,"thunk"]
-                }`
+                }`,
             },
             8: {
                 desc: "Example 4 from specification, parse-types=false",
-                form:
-                `
+                form: `
                 <form hx-ext="json-enc-custom" hx-post="/" parse-types="false">
                     <input name="hearbeat[0]" value="thunk">
                     <input name="hearbeat[2]" value="thunk">
@@ -165,12 +159,11 @@
                 `,
                 expected: `{
                     "hearbeat":["thunk",null,"thunk"]
-                }`
+                }`,
             },
             9: {
                 desc: "Example 5 from specification, parse-types=true",
-                form:
-                `
+                form: `
                 <form hx-ext="json-enc-custom" hx-post="/" parse-types="true">
                     <input name="pet[0][species]" value="Dahut">
                     <input name="pet[0][name]" value="Hypatia">
@@ -189,12 +182,11 @@
                             "name":"Billie"
                         }
                     ]
-                }`
+                }`,
             },
             10: {
                 desc: "Example 5 from specification, parse-types=false",
-                form:
-                `
+                form: `
                 <form hx-ext="json-enc-custom" hx-post="/" parse-types="false">
                     <input name="pet[0][species]" value="Dahut">
                     <input name="pet[0][name]" value="Hypatia">
@@ -213,12 +205,11 @@
                             "name":"Billie"
                         }
                     ]
-                }`
+                }`,
             },
             11: {
                 desc: "Example 6 from specification, parse-types=true",
-                form:
-                `
+                form: `
                 <form hx-ext="json-enc-custom" hx-post="/" parse-types="true">
                     <input name="wow[such][deep][3][much][power][!]" value="Amaze">
                 </form>
@@ -240,12 +231,11 @@
                             ]
                         }
                     }
-                }`
+                }`,
             },
             12: {
                 desc: "Example 6 from specification, parse-types=false",
-                form:
-                `
+                form: `
                 <form hx-ext="json-enc-custom" hx-post="/" parse-types="false">
                     <input name="wow[such][deep][3][much][power][!]" value="Amaze">
                 </form>
@@ -267,12 +257,11 @@
                             ]
                         }
                     }
-                }`
+                }`,
             },
             13: {
                 desc: "Example 7 from specification, parse-types=true",
-                form:
-                `
+                form: `
                 <form hx-ext="json-enc-custom" hx-post="/" parse-types="true">
                     <input name="mix" value="scalar">
                     <input name="mix[0]" value="array 1">
@@ -288,13 +277,12 @@
                         "2":"array 2",
                         "key":"key key",
                         "car":"car key"}
-                    }`
+                    }`,
             },
             14: {
                 desc: "Example 7 from specification, parse-types=false",
-                form:
-                `
-                <form hx-ext="json-enc-custom" hx-post="/" parse-types="true">
+                form: `
+                <form hx-ext="json-enc-custom" hx-post="/" parse-types="false">
                     <input name="mix" value="scalar">
                     <input name="mix[0]" value="array 1">
                     <input name="mix[2]" value="array 2">
@@ -310,38 +298,35 @@
                         "key":"key key",
                         "car":"car key"
                     }
-                }`
+                }`,
             },
             15: {
                 desc: "Example 8 from specification, parse-types=true",
-                form:
-                `
+                form: `
                 <form hx-ext="json-enc-custom" hx-post="/" parse-types="true">
                     <input name="highlander[]" value="one">
                 </form>
                 `,
                 expected: `{
                     "highlander":["one"]
-                }`
+                }`,
             },
             16: {
                 desc: "Example 8 from specification, parse-types=false",
-                form:
-                `
+                form: `
                 <form hx-ext="json-enc-custom" hx-post="/" parse-types="false">
                     <input name="highlander[]" value="one">
                 </form>
                 `,
                 expected: `{
                     "highlander":["one"]
-                }`
+                }`,
             },
             // Example 9 is not included because it contains a file input
             // may be included in later version (but now it makes no sense)
             17: {
                 desc: "Example 10 from specification, parse-types=true",
-                form:
-                `
+                form: `
                 <form hx-ext="json-enc-custom" hx-post="/" parse-types="true">
                     <input name="error[good]" value="BOOM!">
                     <input name="error[bad" value="BOOM BOOM!">
@@ -350,12 +335,11 @@
                 expected: `{
                     "error":{"good":"BOOM!"},
                     "error[bad":"BOOM BOOM!"
-                }`
+                }`,
             },
             18: {
                 desc: "Example 10 from specification, parse-types=false",
-                form:
-                `
+                form: `
                 <form hx-ext="json-enc-custom" hx-post="/" parse-types="false">
                     <input name="error[good]" value="BOOM!">
                     <input name="error[bad" value="BOOM BOOM!">
@@ -364,12 +348,11 @@
                 expected: `{
                     "error":{"good":"BOOM!"},
                     "error[bad":"BOOM BOOM!"
-                }`
+                }`,
             },
             19: {
                 desc: "All possible tags in form, parse-types=true",
-                form:
-                `
+                form: `
                 <form 
                     hx-ext="json-enc-custom" 
                     hx-post="/" 
@@ -420,12 +403,11 @@
                     "select-one-numbers":3.14,
                     "select-multiple-combined":["multiple-2","3"],
                     "select-multiple-numbers":[1,2]
-                }`
+                }`,
             },
             20: {
                 desc: "All possible tags in form, parse-types=false",
-                form:
-                `
+                form: `
                 <form 
                     hx-ext="json-enc-custom" 
                     hx-post="/" 
@@ -476,12 +458,11 @@
                     "select-one-numbers":"3.14",
                     "select-multiple-combined":["multiple-2","3"],
                     "select-multiple-numbers":["1","2"]
-                }`
+                }`,
             },
             21: {
                 desc: "select[multiple] with only one option selected",
-                form:
-                `
+                form: `
                 <form hx-ext="json-enc-custom" hx-post="/" parse-types="false">
                     <select name="select" multiple> 
                         <option value="1" selected>First</option>
@@ -492,12 +473,11 @@
                 `,
                 expected: `{
                     "select": ["1"]
-                }`
+                }`,
             },
             22: {
-                desc: "name is equal to \"values\"",
-                form:
-                `
+                desc: 'name is equal to "values"',
+                form: `
                 <form hx-ext="json-enc-custom" hx-post="/" parse-types="false">
                     <input type="text" name="values" value="abc"></input>
                     <input type="text" name="value"  value="abc"></input>
@@ -506,14 +486,40 @@
                 expected: `{
                     "values": "abc",
                     "value": "abc"
-                }`
+                }`,
+            },
+            23: {
+                desc: "multipart support",
+                form: `
+                <form hx-ext="json-enc-custom" hx-post="/" hx-multipart parse-types="false">
+                    <input type="file" name="sampleFile"></input>
+                    <input type="text" name="value"  value="abc"></input>
+                </form>
+                `,
+                expected: `{
+                    "data": { "value": "abc" },
+                    "files": ["test-case-23-0.txt"]
+                }`,
+            },
+            24: {
+                desc: "multipart support with multiple files",
+                form: `
+                <form hx-ext="json-enc-custom" hx-post="/" hx-multipart parse-types="false">
+                    <input type="file" name="sampleFile" multiple></input>
+                    <input type="text" name="value"  value="abc"></input>
+                </form>
+                `,
+                expected: `{
+                    "data": { "value": "abc" },
+                    "files": ["test-case-24-0.txt", "test-case-24-1.txt"]
+                }`,
             },
         };
 
         const urlParams = new URLSearchParams(window.location.search);
         const isolateTestKey = urlParams.get("isolate-test");
 
-        Object.keys(testCases).forEach(function(testCaseKey) {
+        Object.keys(testCases).forEach(function (testCaseKey) {
             const testCase = testCases[testCaseKey];
             if (isolateTestKey !== null) {
                 if (testCaseKey == isolateTestKey) {
@@ -526,4 +532,5 @@
         });
     </script>
 </body>
+
 </html>
