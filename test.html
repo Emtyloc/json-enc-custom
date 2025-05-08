@@ -294,7 +294,7 @@
                 desc: "Example 7 from specification, parse-types=false",
                 form:
                 `
-                <form hx-ext="json-enc-custom" hx-post="/" parse-types="true">
+                <form hx-ext="json-enc-custom" hx-post="/" parse-types="false">
                     <input name="mix" value="scalar">
                     <input name="mix[0]" value="array 1">
                     <input name="mix[2]" value="array 2">
@@ -506,6 +506,34 @@
                 expected: `{
                     "values": "abc",
                     "value": "abc"
+                }`
+            },
+            23: {
+                desc: "multipart/form-data single file",
+                form:
+                `
+                <form hx-ext="json-enc-custom" hx-post="/" hx-multipart parse-types="false">
+                    <input type="file" name="sampleFile"></input>
+                    <input type="text" name="value"  value="abc"></input>
+                </form>
+                `,
+                expected: `{
+                    "data": { "value": "abc" },
+                    "files": ["test-case-23-0.txt"]
+                }`
+            },
+            24: {
+                desc: "multipart/form-data multiple files",
+                form:
+                `
+                <form hx-ext="json-enc-custom" hx-post="/" hx-multipart parse-types="false">
+                    <input type="file" name="sampleFile" multiple></input>
+                    <input type="text" name="value"  value="abc"></input>
+                </form>
+                `,
+                expected: `{
+                    "data": { "value": "abc" },
+                    "files": ["test-case-24-0.txt", "test-case-24-1.txt"]
                 }`
             },
         };

@@ -50,10 +50,37 @@ function replaceDefaultRequestSender() {
 function submitAllForms() {
     const testTable = document.getElementById("test-cases");
     const testCases = Array.from(testTable.children);
-    testCases.forEach(function(testCase) {
+    testCases.forEach(function(testCase, index) {
         const form = testCase.querySelector("tr th form");
+        const inputTypeFile = form.querySelector('input[type="file"]');
+        if (inputTypeFile) {
+            let numberOfFiles;
+            if (inputTypeFile.hasAttribute("multiple")) {
+                numberOfFiles = 2;
+            } else {
+                numberOfFiles = 1;
+            }
+            simulateFileUpload(inputTypeFile, `test-case-${index + 1}`, "text/plain", numberOfFiles);
+        }
         form.requestSubmit();
     })
+}
+
+function simulateFileUpload(inputElement, fileNameBase, fileType, numberOfFiles) {
+    // Create a DataTransfer to simulate the file selection
+    const dataTransfer = new DataTransfer();
+
+    for (let i = 0; i < numberOfFiles; i++) {
+        const file = new File(["dummy content"], `${fileNameBase}-${i}.txt`, {
+            type: fileType,
+        });
+        dataTransfer.items.add(file);
+    }
+
+    inputElement.files = dataTransfer.files;
+
+    const event = new Event("change", { bubbles: true });
+    inputElement.dispatchEvent(event);
 }
 
 function setActualResult(testCase, result) {
@@ -116,7 +143,20 @@ window.onload = function() {
     document.addEventListener("htmx:beforeSend", function(evt) {
         const testCase = evt.detail.target; // the hx-target in form is always set to the parent element on purpose
         setTimeout(function() {
-            setActualResult(testCase, evt.detail.xhr.capturedBody); // filling the Actual Result column
+            if (
+                evt.detail.requestConfig.headers["Content-Type"] ===
+                "multipart/form-data"
+            ) {
+                // since we will have formData, in the Actual Result column
+                // we set formData.get('data') with file name
+                const formData = evt.detail.xhr.capturedBody;
+                const dataResult = JSON.parse(formData.get("data"));
+                const fileResult = formData.getAll("file").map((file) => file.name);
+                const result = JSON.stringify({ data: dataResult, files: fileResult });
+                setActualResult(testCase, result);
+            } else {
+                setActualResult(testCase, evt.detail.xhr.capturedBody); // filling the Actual Result column
+            }
             passed = checkTestResult(testCase); // coloring test case and filling the Diff column 
             if (passed) {
                 passedCount++;

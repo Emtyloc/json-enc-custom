@@ -6,11 +6,18 @@
         },
         onEvent: function (name, evt) {
             if (name === "htmx:configRequest") {
-                evt.detail.headers['Content-Type'] = "application/json";
+                let element = evt.detail.elt;
+                if (element.hasAttribute("hx-multipart")) {
+                    evt.detail.headers["Content-Type"] = "multipart/form-data";
+                } else {
+                    evt.detail.headers["Content-Type"] = "application/json";
+                }
             }
         },
         encodeParameters: function (xhr, parameters, elt) {
-            xhr.overrideMimeType('text/json');
+            if (!elt.hasAttribute("hx-multipart")) {
+                xhr.overrideMimeType('text/json');
+            }
 
             let encoded_parameters = encodingAlgorithm(parameters, elt);
 
@@ -19,6 +26,7 @@
     });
 
     function encodingAlgorithm(parameters, elt, includedElt) {
+        let files = [];
         let resultingObject = Object.create(null);
         const PARAM_NAMES = Object.keys(parameters);
         const PARAM_VALUES = Object.values(parameters);
@@ -28,28 +36,46 @@
             let name = PARAM_NAMES[param_index];
             let value = PARAM_VALUES[param_index];
 
-            const elements = getChildrenByName(elt, name);
-            if (isSelectMultiple(elements) && !Array.isArray(value)) {
-                value = [value]; // force the value of select multiple to be an array
-            }
+            if (value instanceof File) {
+                files.push(value);
+            } else if (
+                Array.isArray(value) &&
+                Object.values(value).every((val) => val instanceof File)
+            ) {
+                files = Object.values(value);
+            } else {
+                const elements = getChildrenByName(elt, name);
+                if (isSelectMultiple(elements) && !Array.isArray(value)) {
+                    value = [value]; // force the value of select multiple to be an array
+                }
 
-            let parse_value = api.getAttributeValue(elt, "parse-types");
-            if (parse_value === "true" ) {
-                let includedElt = getIncludedElement(elt);
-                value = parseValues(elements, includedElt, value);
-            }
+                let parse_value = api.getAttributeValue(elt, "parse-types");
+                if (parse_value === "true") {
+                    let includedElt = getIncludedElement(elt);
+                    value = parseValues(elements, includedElt, value);
+                }
 
-            let steps = JSONEncodingPath(name);
-            let context = resultingObject;
+                let steps = JSONEncodingPath(name);
+                let context = resultingObject;
 
-            for (let step_index = 0; step_index < steps.length; step_index++) {
-                let step = steps[step_index];
-                context = setValueFromPath(context, step, value);
+                for (let step_index = 0; step_index < steps.length; step_index++) {
+                    let step = steps[step_index];
+                    context = setValueFromPath(context, step, value);
+                }
             }
         }
 
         let result = JSON.stringify(resultingObject);
-        return result
+        if (elt.hasAttribute("hx-multipart")) {
+            const formData = new FormData();
+            formData.append("data", result);
+            for (const file of files) {
+                formData.append("file", file);
+            }
+            return formData;
+        } else {
+            return result;
+        }
     }
 
     function getChildrenByName(original, name) {
@@ -63,7 +89,7 @@
             elements.length === 1 &&
             elements[0] instanceof HTMLSelectElement &&
             elements[0].type === "select-multiple"
-        )   
+        )
     }
 
     function parseValues(elements, includedElt, value) {
@@ -77,7 +103,7 @@
         }
 
         if (!Array.isArray(value)) return parseElementValue(elements[0], value);
-        
+
         if (isSelectMultiple(elements)) {
             const elt = elements[0];
             const convertToNumber = checkAllPossibleOptionsAreNumbers(elt);
@@ -194,7 +220,7 @@
             context[step.key] = value;
         }
 
-        //TODO: make merge functionality and file suport.
+        //TODO: make merge functionality.
 
         //check if the context value already exists
         if (context[step.key] === undefined) {
@@ -230,7 +256,7 @@
         if (includedSelector) {
             // "hx-include" can be inherited so `elt` will not always be the root element
             let eltWithInclude = api.getClosestMatch(elt, function(e) {
-              return e.matches(`[hx-include="${includedSelector}"]`);
+                return e.matches(`[hx-include="${includedSelector}"]`);
             })
 
             return api.querySelectorExt(eltWithInclude, includedSelector)
