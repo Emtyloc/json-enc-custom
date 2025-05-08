@@ -8,24 +8,22 @@ const waitForAllTestsToComplete = 250; // milliseconds
 let lastTestIndex = 0; // last test case index (changed when new test cases are added)
 
 function prettyJSON(jsonString) {
-    return JSON.stringify(JSON.parse(jsonString), null, 4);
+    return JSON.stringify(JSON.parse(jsonString), null, 4)
 }
 
 function addTestCase(testCaseKey, testCase, expectedResult) {
     lastTestIndex++;
     if (testCaseKey != lastTestIndex) {
-        throw new Error(
-            `Test case key doesn't match test case index: ${testCaseKey} != ${lastTestIndex}`
-        );
+        throw new Error(`Test case key doesn't match test case index: ${testCaseKey} != ${lastTestIndex}`);
     }
 
-    const testCases = document.getElementById("test-cases");
-    const newTestCase = document.createElement("tr");
+    const testCases = document.getElementById('test-cases');
+    const newTestCase = document.createElement('tr');
     newTestCase.id = `test-case-${lastTestIndex}`;
 
     newTestCase.innerHTML = `
         <th>${lastTestIndex}</th>
-        <th id=${lastTestIndex}>
+        <th>
             ${testCase}
         </th>
         <th><pre>${prettyJSON(expectedResult)}</pre></th>
@@ -33,17 +31,15 @@ function addTestCase(testCaseKey, testCase, expectedResult) {
         <th></th>
     `;
 
-    newTestCase.children[formIndex]
-        .querySelector("form")
-        .setAttribute("hx-target", `#test-case-${lastTestIndex}`);
+    newTestCase.children[formIndex].querySelector("form").setAttribute("hx-target", `#test-case-${lastTestIndex}`)
     testCases.appendChild(newTestCase);
 }
 
-// replaces default XMLHttpRequest send method so when htmx tries
-// to send a request, instead of actually sending it, browser will just
+// replaces default XMLHttpRequest send method so when htmx tries 
+// to send a request, instead of actually sending it, browser will just 
 // add a request body to the object (for using in htmx:beforeSend event listener)
 function replaceDefaultRequestSender() {
-    XMLHttpRequest.prototype.send = function (body) {
+    XMLHttpRequest.prototype.send = function(body) {
         this.capturedBody = body;
     };
 }
@@ -54,7 +50,7 @@ function replaceDefaultRequestSender() {
 function submitAllForms() {
     const testTable = document.getElementById("test-cases");
     const testCases = Array.from(testTable.children);
-    testCases.forEach(function (testCase, index) {
+    testCases.forEach(function(testCase, index) {
         const form = testCase.querySelector("tr th form");
         const inputTypeFile = form.querySelector('input[type="file"]');
         if (inputTypeFile) {
@@ -71,40 +67,29 @@ function submitAllForms() {
                 numberOfFiles
             );
         }
-
         form.requestSubmit();
-    });
+    })
 }
 
-function setActualResult(testCase, result) {
-    testCase.children[actualResultIndex].innerHTML = `<pre>${prettyJSON(
-        result
-    )}</pre>`;
-}
-
-function simulateFileUpload(
-    inputElement,
-    fileNameBase,
-    fileType,
-    numberOfFiles
-) {
+function simulateFileUpload(inputElement, fileNameBase, fileType, numberOfFiles) {
     // Create a DataTransfer to simulate the file selection
     const dataTransfer = new DataTransfer();
 
     for (let i = 0; i < numberOfFiles; i++) {
-        // Create a mock file
         const file = new File(["dummy content"], `${fileNameBase}-${i}.txt`, {
             type: fileType,
         });
         dataTransfer.items.add(file);
     }
 
-    // Assign the file list to the input element
     inputElement.files = dataTransfer.files;
 
-    // Dispatch the 'change' event to simulate user action
     const event = new Event("change", { bubbles: true });
     inputElement.dispatchEvent(event);
+}
+
+function setActualResult(testCase, result) {
+    testCase.children[actualResultIndex].innerHTML = `<pre>${prettyJSON(result)}</pre>`;
 }
 
 function checkTestResult(testCase) {
@@ -113,18 +98,15 @@ function checkTestResult(testCase) {
     const actual = testCase.children[actualResultIndex];
     const diff = testCase.children[diffIndex];
 
-    const diffContent = diffString(
-        expected.querySelector("pre").innerHTML,
-        actual.querySelector("pre").innerHTML
-    );
+    const diffContent = diffString(expected.querySelector("pre").innerHTML, actual.querySelector("pre").innerHTML);
     if (diffContent.length === 0) {
         diff.innerHTML = "✅";
         form.classList.add("pass");
-        return true;
+        return true
     } else {
         diff.innerHTML = diffContent;
         form.classList.add("fail");
-        return false;
+        return false
     }
 }
 
@@ -137,38 +119,35 @@ function diffString(expected, actual) {
     let diff = "";
     let i = 0;
     let j = 0;
-
+  
     while (i < expected.length || j < actual.length) {
-        if (i < expected.length && j < actual.length && expected[i] === actual[j]) {
-            diff += expected[i];
-            i++;
-            j++;
-        } else if (i < expected.length) {
-            diff += `<span class="diff-removed">${expected[i]}</span>`;
-            i++;
-        } else if (j < actual.length) {
-            diff += `<span class="diff-added">${actual[j]}</span>`;
-            j++;
-        }
+      if (i < expected.length && j < actual.length && expected[i] === actual[j]) {
+        diff += expected[i];
+        i++;
+        j++;
+      } else if (i < expected.length) {
+        diff += `<span class="diff-removed">${expected[i]}</span>`;
+        i++;
+      } else if (j < actual.length) {
+        diff += `<span class="diff-added">${actual[j]}</span>`;
+        j++;
+      }
     }
-
+    
     return diff;
 }
 
 function setTestResults(passed, total) {
     const results = document.getElementById("test-results");
-    results.innerHTML = `Passed ${passed}/${total} tests - ${(
-        (passed * 100) /
-        total
-    ).toFixed(2)}% success rate`;
+    results.innerHTML = `Passed ${passed}/${total} tests - ${(passed * 100 / total).toFixed(2)}% success rate`
 }
 
-window.onload = function () {
-    let passedCount = 0;
+window.onload = function() {
+    let passedCount = 0;    
 
-    document.addEventListener("htmx:beforeSend", function (evt) {
+    document.addEventListener("htmx:beforeSend", function(evt) {
         const testCase = evt.detail.target; // the hx-target in form is always set to the parent element on purpose
-        setTimeout(function () {
+        setTimeout(function() {
             if (
                 evt.detail.requestConfig.headers["Content-Type"] ===
                 "multipart/form-data"
@@ -183,17 +162,19 @@ window.onload = function () {
             } else {
                 setActualResult(testCase, evt.detail.xhr.capturedBody); // filling the Actual Result column
             }
-            passed = checkTestResult(testCase); // coloring test case and filling the Diff column
+            passed = checkTestResult(testCase); // coloring test case and filling the Diff column 
             if (passed) {
                 passedCount++;
             }
         }, waitForRequestToHappenTimeout);
-    });
+    })
 
     replaceDefaultRequestSender(); // replacing XMLHTTPRequest sender
     submitAllForms(); // submitting all forms to run the test
 
-    setTimeout(function () {
-        setTestResults(passedCount, lastTestIndex);
-    }, waitForAllTestsToComplete);
-};
+    setTimeout(
+        function() {
+            setTestResults(passedCount, lastTestIndex)
+        }, waitForAllTestsToComplete
+    );
+}
