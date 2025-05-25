@@ -11,6 +11,10 @@ Reference: [W3C HTML JSON form submission](https://www.w3.org/TR/html-json-forms
 <script src="https://cdn.jsdelivr.net/gh/Emtyloc/json-enc-custom@v0.1.0/json-enc-custom.js"></script>
 ```
 
+## Attributes
+- `parse-types` - possible values are `"true"` or `"false"`. The rest is explained below.
+- `force-array` - value must be a set of names separated by commas. For example: `"name,phone,address"`. The values of the elements with these names will always be arrays.
+
 ## Examples
 
 By default, the JSON sent uses the browser's form-encoding convention, which means everything is sent as a string. If you want to send parsed data, such as numbers or booleans for checkboxes, use `parse-types="true"`. (The parsing applies for inputs of type `checkbox`, `number`, `range`, `select`).
