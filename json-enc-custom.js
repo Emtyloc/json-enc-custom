@@ -28,6 +28,10 @@
     function encodingAlgorithm(parameters, elt, includedElt) {
         let files = [];
         let resultingObject = Object.create(null);
+
+        let parseTypes = api.getAttributeValue(elt, "parse-types") === "true";
+        let forceArray = (api.getAttributeValue(elt, "force-array") ?? "").split(",");
+
         const PARAM_NAMES = Object.keys(parameters);
         const PARAM_VALUES = Object.values(parameters);
         const PARAM_LENGTH = PARAM_NAMES.length;
@@ -45,12 +49,15 @@
                 files = Object.values(value);
             } else {
                 const elements = getChildrenByName(elt, name);
-                if (isSelectMultiple(elements) && !Array.isArray(value)) {
-                    value = [value]; // force the value of select multiple to be an array
-                }
 
-                let parse_value = api.getAttributeValue(elt, "parse-types");
-                if (parse_value === "true") {
+                if (!Array.isArray(value) && (
+                    forceArray.includes(name) || 
+                    isSelectMultiple(elements) // force the value of select multiple to be an array
+                )) {
+                    value = [value];    
+                }
+                
+                if (parseTypes) {
                     let includedElt = getIncludedElement(elt);
                     value = parseValues(elements, includedElt, value);
                 }

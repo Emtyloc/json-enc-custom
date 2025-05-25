@@ -536,6 +536,25 @@
                     "files": ["test-case-24-0.txt", "test-case-24-1.txt"]
                 }`
             },
+            25: {
+                desc: "force-array flag",
+                form:
+                `
+                <form
+                    hx-ext="json-enc-custom"
+                    hx-post="/"
+                    parse-types="true"
+                    force-array="foo,bar"
+                >
+                    <input type="checkbox" name="foo" checked>
+                    <input type="text" name="bar" value="abc"></input>
+                </form>
+                `,
+                expected: `{
+                    "foo": [true],
+                    "bar": ["abc"]
+                }`
+            },
         };
 
         const urlParams = new URLSearchParams(window.location.search);
