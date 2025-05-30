@@ -57,15 +57,23 @@
 
                 console.log(elements);
 
-                if (isCheckbox(elements) && value === null) {
-                    value = "off";
-                } else if (isCheckboxArray(elements) && value === null) {
-                    value = [];
-                } else if (isSelectMultiple(elements) && !Array.isArray(value)) {
+                if (isCheckbox(elements)) {
+                    if (value === null) {
+                        value = "off";
+                    }
+                } else if (isCheckboxArray(elements)) {
                     if (value === null) {
                         value = [];
-                    } else {
-                        value = [value];    
+                    } else if (!Array.isArray(value)) {
+                        value = [value];
+                    }
+                } else if (isSelectMultiple(elements)) {
+                    if (!Array.isArray(value)) {
+                        if (value === null) {
+                            value = [];
+                        } else {
+                            value = [value];    
+                        }
                     }
                 }
                 
