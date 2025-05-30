@@ -28,67 +28,40 @@
     function encodingAlgorithm(parameters, elt, includedElt) {
         let files = [];
         let resultingObject = Object.create(null);
-        const parseTypes = api.getAttributeValue(elt, "parse-types") === "true";
 
+        const parseTypes = api.getAttributeValue(elt, "parse-types") === "true";
         const names = new Set(Array.from(elt.elements, (e) => e.name));
 
         for (const name of names) {
             if (name.length === 0) {
                 continue;
             }
-
             let value = parameters.getAll(name);
-
-            if (value.length === 0) {
-                value = null;
-            } else if (value.length === 1) {
-                value = value[0];
-            }
+            value = prepareRawInputValue(value);
 
             if (value instanceof File) {
                 files.push(value);
-            } else if (
-                Array.isArray(value) &&
-                Object.values(value).every((val) => val instanceof File)
-            ) {
+                continue;
+            }
+            if (Array.isArray(value) && Object.values(value).every((val) => val instanceof File)) {
                 files = Object.values(value);
-            } else {
-                const elements = getChildrenByName(elt, name);
+                continue;
+            }
 
-                console.log(elements);
+            const elements = getChildrenByName(elt, name);
+            value = prepareInputValueWithElements(value, elements);
 
-                if (isCheckbox(elements)) {
-                    if (value === null) {
-                        value = "off";
-                    }
-                } else if (isCheckboxArray(elements)) {
-                    if (value === null) {
-                        value = [];
-                    } else if (!Array.isArray(value)) {
-                        value = [value];
-                    }
-                } else if (isSelectMultiple(elements)) {
-                    if (!Array.isArray(value)) {
-                        if (value === null) {
-                            value = [];
-                        } else {
-                            value = [value];    
-                        }
-                    }
-                }
-                
-                if (parseTypes) {
-                    let includedElt = getIncludedElement(elt);
-                    value = parseValues(elements, includedElt, value);
-                }
+            if (parseTypes) {
+                let includedElt = getIncludedElement(elt);
+                value = parseValues(elements, includedElt, value);
+            }
 
-                let steps = JSONEncodingPath(name);
-                let context = resultingObject;
+            let steps = JSONEncodingPath(name);
+            let context = resultingObject;
 
-                for (let stepIndex = 0; stepIndex < steps.length; stepIndex++) {
-                    const step = steps[stepIndex];
-                    context = setValueFromPath(context, step, value);
-                }
+            for (let stepIndex = 0; stepIndex < steps.length; stepIndex++) {
+                const step = steps[stepIndex];
+                context = setValueFromPath(context, step, value);
             }
         }
 
@@ -103,6 +76,39 @@
         } else {
             return result;
         }
+    }
+
+    function prepareRawInputValue(value) {
+        if (value.length === 0) {
+            return null;
+        }
+        if (value.length === 1) {
+            return value[0];
+        }
+        return value;
+    }
+
+    function prepareInputValueWithElements(value, elements) {
+        // force the checkbox to always have "on" or "off" value
+        if (isCheckbox(elements)) {
+            if (value === null) {
+                return "off";
+            }
+            return value;
+        }
+        
+        // force the select multiple and the checkbox array to always have an array value
+        if (isSelectMultiple(elements) || isCheckboxArray(elements)) {
+            if (Array.isArray(value)) {
+                return value;
+            }
+            if (value === null) {
+                return [];
+            }
+            return [value];    
+        }
+
+        return value;
     }
 
     function getChildrenByName(original, name) {
