@@ -799,6 +799,106 @@
                     "array": [false, false, false, false]
                 }`
             },
+            35: {
+                desc: "select multiple array, parse-types=false",
+                form:
+                `
+                <form 
+                    hx-ext="json-enc-custom" 
+                    hx-post="/" 
+                    parse-types="false"
+                >
+                    <select name="select-multiple" multiple>
+                        <option value="1" selected>1</option>
+                        <option value="2" selected>2</option>
+                        <option value="3">3</option>
+                    </select>
+                    <select name="select-multiple" multiple>
+                        <option value="1">1</option>
+                        <option value="2" selected>2</option>
+                        <option value="3" selected>3</option>
+                    </select>
+                </form>
+                `,
+                expected: `{
+                    "select-multiple": [["1", "2"], ["2", "3"]]
+                }`
+            },
+            36: {
+                desc: "select multiple array, parse-types=true",
+                form:
+                `
+                <form 
+                    hx-ext="json-enc-custom" 
+                    hx-post="/" 
+                    parse-types="true"
+                >
+                    <select name="select-multiple" multiple>
+                        <option value="1" selected>1</option>
+                        <option value="2" selected>2</option>
+                        <option value="3">3</option>
+                    </select>
+                    <select name="select-multiple" multiple>
+                        <option value="1">1</option>
+                        <option value="2" selected>2</option>
+                        <option value="3" selected>3</option>
+                    </select>
+                </form>
+                `,
+                expected: `{
+                    "select-multiple": [[1, 2], [2, 3]]
+                }`
+            },
+            37: {
+                desc: "select array, parse-types=false",
+                form:
+                `
+                <form 
+                    hx-ext="json-enc-custom" 
+                    hx-post="/" 
+                    parse-types="false"
+                >
+                    <select name="select">
+                        <option value="1" selected>1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                    </select>
+                    <select name="select">
+                        <option value="1">1</option>
+                        <option value="2" selected>2</option>
+                        <option value="3">3</option>
+                    </select>
+                </form>
+                `,
+                expected: `{
+                    "select": ["1", "2"]
+                }`
+            },
+            38: {
+                desc: "select array, parse-types=true",
+                form:
+                `
+                <form 
+                    hx-ext="json-enc-custom" 
+                    hx-post="/" 
+                    parse-types="true"
+                >
+                    <select name="select">
+                        <option value="1" selected>1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                    </select>
+                    <select name="select">
+                        <option value="1">1</option>
+                        <option value="2" selected>2</option>
+                        <option value="3">3</option>
+                    </select>
+                </form>
+                `,
+                expected: `{
+                    "select": [1, 2]
+                }`
+            },
         };
 
         const urlParams = new URLSearchParams(window.location.search);
