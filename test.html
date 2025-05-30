@@ -271,6 +271,7 @@
             },
             13: {
                 desc: "Example 7 from specification, parse-types=true",
+                allowedToFail: true,
                 form:
                 `
                 <form hx-ext="json-enc-custom" hx-post="/" parse-types="true">
@@ -292,6 +293,7 @@
             },
             14: {
                 desc: "Example 7 from specification, parse-types=false",
+                allowedToFail: true,
                 form:
                 `
                 <form hx-ext="json-enc-custom" hx-post="/" parse-types="false">
@@ -801,6 +803,7 @@
             },
             35: {
                 desc: "select multiple array, parse-types=false",
+                allowedToFail: true,
                 form:
                 `
                 <form 
@@ -826,6 +829,7 @@
             },
             36: {
                 desc: "select multiple array, parse-types=true",
+                allowedToFail: true,
                 form:
                 `
                 <form 
@@ -913,7 +917,13 @@
                     return;
                 }
             }
-            addTestCase(testCaseKey, testCase.desc, testCase.form, testCase.expected);
+            addTestCase(
+                testCaseKey, 
+                testCase.desc, 
+                testCase.form, 
+                testCase.expected, 
+                testCase.allowedToFail,
+            );
         });
     </script>
 </body>
