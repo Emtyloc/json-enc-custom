@@ -36,6 +36,10 @@ th, td {
     background-color: #ffcccc;
 }
 
+.allowed-to-fail-text {
+    color: #d32500;
+}
+
 #test-results-container {
     display: flex;
     justify-content: center;

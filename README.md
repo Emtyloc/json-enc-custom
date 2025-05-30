@@ -13,6 +13,8 @@ Reference: [W3C HTML JSON form submission](https://www.w3.org/TR/html-json-forms
 
 ## Examples
 
+NB! You can see more example in `test.html`.
+
 By default, the JSON sent uses the browser's form-encoding convention, which means everything is sent as a string. If you want to send parsed data, such as numbers or booleans for checkboxes, use `parse-types="true"`. (The parsing applies for inputs of type `checkbox`, `number`, `range`, `select`).
 
 ```html

@@ -4,14 +4,16 @@ const actualResultIndex = 3;
 const diffIndex = 4;
 
 const waitForRequestToHappenTimeout = 50; // milliseconds
-const waitForAllTestsToComplete = 250; // milliseconds
+const waitForAllTestsToCompleteTimeout = 250; // milliseconds
+
 let lastTestIndex = 0; // last test case index (changed when new test cases are added)
+let allowedToFailTestCount = 0; // amount of tests that are allowed to fail
 
 function prettyJSON(jsonString) {
     return JSON.stringify(JSON.parse(jsonString), null, 4)
 }
 
-function addTestCase(testCaseKey, testCase, expectedResult) {
+function addTestCase(testCaseKey, testCaseDesc, testCase, expectedResult, allowedToFail) {
     lastTestIndex++;
     if (testCaseKey != lastTestIndex) {
         throw new Error(`Test case key doesn't match test case index: ${testCaseKey} != ${lastTestIndex}`);
@@ -21,9 +23,18 @@ function addTestCase(testCaseKey, testCase, expectedResult) {
     const newTestCase = document.createElement('tr');
     newTestCase.id = `test-case-${lastTestIndex}`;
 
+    let allowedToFailText = "";
+    if (allowedToFail === true) {
+        allowedToFailTestCount++;
+        newTestCase.classList.add("allowed-to-fail");
+        allowedToFailText = "!!! ALLOWED TO FAIL - to fix in the future";
+    }
+
     newTestCase.innerHTML = `
         <th>${lastTestIndex}</th>
         <th>
+            <h3 class="allowed-to-fail-text">${allowedToFailText}</h3>
+            <p>${testCaseDesc}</p>
             ${testCase}
         </th>
         <th><pre>${prettyJSON(expectedResult)}</pre></th>
@@ -31,7 +42,12 @@ function addTestCase(testCaseKey, testCase, expectedResult) {
         <th></th>
     `;
 
-    newTestCase.children[formIndex].querySelector("form").setAttribute("hx-target", `#test-case-${lastTestIndex}`)
+    const newTestCaseHTMLPre = document.createElement(`pre`);
+    const newTestCaseHTMLContent = document.createTextNode(testCase);
+    newTestCaseHTMLPre.appendChild(newTestCaseHTMLContent);
+
+    newTestCase.children[formIndex].appendChild(newTestCaseHTMLPre);
+    newTestCase.children[formIndex].querySelector("form").setAttribute("hx-target", `#test-case-${lastTestIndex}`);
     testCases.appendChild(newTestCase);
 }
 
@@ -93,15 +109,18 @@ function checkTestResult(testCase) {
     const actual = testCase.children[actualResultIndex];
     const diff = testCase.children[diffIndex];
 
-    const diffContent = diffString(expected.querySelector("pre").innerHTML, actual.querySelector("pre").innerHTML);
+    const diffContent = diffString(
+        expected.querySelector("pre").innerHTML, 
+        actual.querySelector("pre").innerHTML,
+    );
     if (diffContent.length === 0) {
         diff.innerHTML = "✅";
         form.classList.add("pass");
-        return true
+        return true;
     } else {
         diff.innerHTML = diffContent;
         form.classList.add("fail");
-        return false
+        return false;
     }
 }
 
@@ -134,7 +153,8 @@ function diffString(expected, actual) {
 
 function setTestResults(passed, total) {
     const results = document.getElementById("test-results");
-    results.innerHTML = `Passed ${passed}/${total} tests - ${(passed * 100 / total).toFixed(2)}% success rate`
+    results.innerHTML = `Passed ${passed}/${total} tests - ${(passed * 100 / total).toFixed(2)}% success rate`;
+    results.innerHTML += "<br>(allowed to fail test cases are not counted)";
 }
 
 window.onload = function() {
@@ -158,7 +178,7 @@ window.onload = function() {
                 setActualResult(testCase, evt.detail.xhr.capturedBody); // filling the Actual Result column
             }
             passed = checkTestResult(testCase); // coloring test case and filling the Diff column 
-            if (passed) {
+            if (passed && !testCase.classList.contains("allowed-to-fail")) { // don't count allowed to fail tests
                 passedCount++;
             }
         }, waitForRequestToHappenTimeout);
@@ -169,7 +189,7 @@ window.onload = function() {
 
     setTimeout(
         function() {
-            setTestResults(passedCount, lastTestIndex)
-        }, waitForAllTestsToComplete
+            setTestResults(passedCount, lastTestIndex - allowedToFailTestCount);
+        }, waitForAllTestsToCompleteTimeout
     );
 }
