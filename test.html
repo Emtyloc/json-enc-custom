@@ -537,22 +537,266 @@
                 }`
             },
             25: {
-                desc: "force-array flag",
+                desc: "checkboxes array, parse-types=true",
                 form:
                 `
                 <form
                     hx-ext="json-enc-custom"
                     hx-post="/"
                     parse-types="true"
-                    force-array="foo,bar"
                 >
-                    <input type="checkbox" name="foo" checked>
-                    <input type="text" name="bar" value="abc"></input>
+                    <input type="checkbox" name="array" value="el1" checked>
+                    <input type="checkbox" name="array" value="el2">
+                    <input type="checkbox" name="array" value="el3" checked>
+                    <input type="checkbox" name="array" value="el4">
                 </form>
                 `,
                 expected: `{
-                    "foo": [true],
-                    "bar": ["abc"]
+                    "array": [true, false, true, false]
+                }`
+            },
+            26: {
+                desc: "checkboxes array, parse-types=false",
+                form:
+                `
+                <form
+                    hx-ext="json-enc-custom"
+                    hx-post="/"
+                    parse-types="false"
+                >
+                    <input type="checkbox" name="array" value="el1" checked>
+                    <input type="checkbox" name="array" value="el2">
+                    <input type="checkbox" name="array" value="el3" checked>
+                    <input type="checkbox" name="array" value="el4">
+                </form>
+                `,
+                expected: `{
+                    "array": ["el1", "el3"]
+                }`
+            },
+            27: {
+                desc: "force checkbox array, two selected",
+                form:
+                `
+                <form
+                    hx-ext="json-enc-custom"
+                    hx-post="/"
+                >
+                    <input type="checkbox" name="array[]" value="el1" checked>
+                    <input type="checkbox" name="array[]" value="el2">
+                    <input type="checkbox" name="array[]" value="el3">
+                    <input type="checkbox" name="array[]" value="el4" checked>
+                </form>
+                `,
+                expected: `{
+                    "array": ["el1", "el4"]
+                }`
+            },
+            28: {
+                desc: "force checkbox array, one selected",
+                form:
+                `
+                <form
+                    hx-ext="json-enc-custom"
+                    hx-post="/"
+                >
+                    <input type="checkbox" name="array[]" value="el1">
+                    <input type="checkbox" name="array[]" value="el2">
+                    <input type="checkbox" name="array[]" value="el3">
+                    <input type="checkbox" name="array[]" value="el4" checked>
+                </form>
+                `,
+                expected: `{
+                    "array": ["el4"]
+                }`
+            },
+            29: {
+                desc: "force checkbox array, none selected",
+                form:
+                `
+                <form
+                    hx-ext="json-enc-custom"
+                    hx-post="/"
+                >
+                    <input type="checkbox" name="array[]" value="el1">
+                    <input type="checkbox" name="array[]" value="el2">
+                    <input type="checkbox" name="array[]" value="el3">
+                    <input type="checkbox" name="array[]" value="el4">
+                </form>
+                `,
+                expected: `{
+                    "array": []
+                }`
+            },
+            30: {
+                desc: "All possible tags in form, no values, parse-types=false",
+                form:
+                `
+                <form 
+                    hx-ext="json-enc-custom" 
+                    hx-post="/" 
+                    parse-types="false"
+                >
+                    <fieldset>
+                        <input name="number" type="number" value="">
+                        <input name="text" type="text" value="">
+                        <input name="checkbox" type="checkbox">
+                        <input name="checkbox2" type="checkbox">
+                        <input name="checkbox2" type="checkbox">
+                        <input name="unknown" value="">
+                    </fieldset>
+                    <textarea name="textarea"></textarea>
+                    <select name="select-one-combined">
+                        <optgroup label="String options">
+                            <option value="first">First</option>
+                            <option value="second">Second</option>
+                        </optgroup>
+                        <optgroup label="Number options">
+                            <option value="10">10</option>
+                            <option value="3.14">3.14</option>
+                        </optgroup>
+                    </select>
+                    <select name="select-one-numbers">
+                        <option value="10">10</option>
+                        <option value="3.14">3.14</option>
+                    </select>
+                    <select name="select-multiple-combined" multiple>
+                        <option value="multiple-1">multiple-1</option>
+                        <option value="multiple-2">multiple-2</option>
+                        <option value="3">3</option>
+                    </select>
+                    <select name="select-multiple-numbers" multiple>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                    </select>
+                </form>
+                `,
+                expected: `{
+                    "number":"",
+                    "text":"",
+                    "checkbox":"off",
+                    "checkbox2":[],
+                    "unknown":"",
+                    "textarea":"",
+                    "select-one-combined":"first",
+                    "select-one-numbers":"10",
+                    "select-multiple-combined":[],
+                    "select-multiple-numbers":[]
+                }`
+            },
+            31: {
+                desc: "All possible tags in form, no values, parse-types=true",
+                form:
+                `
+                <form 
+                    hx-ext="json-enc-custom" 
+                    hx-post="/" 
+                    parse-types="true"
+                >
+                    <fieldset>
+                        <input name="number" type="number" value="">
+                        <input name="text" type="text" value="">
+                        <input name="checkbox" type="checkbox">
+                        <input name="checkbox2" type="checkbox">
+                        <input name="checkbox2" type="checkbox">
+                        <input name="unknown" value="">
+                    </fieldset>
+                    <textarea name="textarea"></textarea>
+                    <select name="select-one-combined">
+                        <optgroup label="String options">
+                            <option value="first">First</option>
+                            <option value="second">Second</option>
+                        </optgroup>
+                        <optgroup label="Number options">
+                            <option value="10">10</option>
+                            <option value="3.14">3.14</option>
+                        </optgroup>
+                    </select>
+                    <select name="select-one-numbers">
+                        <option value="10">10</option>
+                        <option value="3.14">3.14</option>
+                    </select>
+                    <select name="select-multiple-combined" multiple>
+                        <option value="multiple-1">multiple-1</option>
+                        <option value="multiple-2">multiple-2</option>
+                        <option value="3">3</option>
+                    </select>
+                    <select name="select-multiple-numbers" multiple>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                    </select>
+                </form>
+                `,
+                expected: `{
+                    "number":0,
+                    "text":"",
+                    "checkbox":false,
+                    "checkbox2":[false,false],
+                    "unknown":"",
+                    "textarea":"",
+                    "select-one-combined":"first",
+                    "select-one-numbers":10,
+                    "select-multiple-combined":[],
+                    "select-multiple-numbers":[]
+                }`
+            },
+            32: {
+                desc: "force checkbox array, two selected, parse-types=true",
+                form:
+                `
+                <form
+                    hx-ext="json-enc-custom"
+                    hx-post="/"
+                    parse-types="true"
+                >
+                    <input type="checkbox" name="array[]" value="el1" checked>
+                    <input type="checkbox" name="array[]" value="el2">
+                    <input type="checkbox" name="array[]" value="el3">
+                    <input type="checkbox" name="array[]" value="el4" checked>
+                </form>
+                `,
+                expected: `{
+                    "array": [true, false, false, true]
+                }`
+            },
+            33: {
+                desc: "force checkbox array, one selected, parse-types=true",
+                form:
+                `
+                <form
+                    hx-ext="json-enc-custom"
+                    hx-post="/"
+                    parse-types="true"
+                >
+                    <input type="checkbox" name="array[]" value="el1">
+                    <input type="checkbox" name="array[]" value="el2">
+                    <input type="checkbox" name="array[]" value="el3">
+                    <input type="checkbox" name="array[]" value="el4" checked>
+                </form>
+                `,
+                expected: `{
+                    "array": [false, false, false, true]
+                }`
+            },
+            34: {
+                desc: "force checkbox array, none selected, parse-types=true",
+                form:
+                `
+                <form
+                    hx-ext="json-enc-custom"
+                    hx-post="/"
+                    parse-types="true"
+                >
+                    <input type="checkbox" name="array[]" value="el1">
+                    <input type="checkbox" name="array[]" value="el2">
+                    <input type="checkbox" name="array[]" value="el3">
+                    <input type="checkbox" name="array[]" value="el4">
+                </form>
+                `,
+                expected: `{
+                    "array": [false, false, false, false]
                 }`
             },
         };
@@ -569,7 +813,7 @@
                     return;
                 }
             }
-            addTestCase(testCaseKey, testCase.form, testCase.expected);
+            addTestCase(testCaseKey, testCase.desc, testCase.form, testCase.expected);
         });
     </script>
 </body>

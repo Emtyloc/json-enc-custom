@@ -4,14 +4,14 @@ const actualResultIndex = 3;
 const diffIndex = 4;
 
 const waitForRequestToHappenTimeout = 50; // milliseconds
-const waitForAllTestsToComplete = 250; // milliseconds
+const waitForAllTestsToCompleteTimeout = 250; // milliseconds
 let lastTestIndex = 0; // last test case index (changed when new test cases are added)
 
 function prettyJSON(jsonString) {
     return JSON.stringify(JSON.parse(jsonString), null, 4)
 }
 
-function addTestCase(testCaseKey, testCase, expectedResult) {
+function addTestCase(testCaseKey, testCaseDesc, testCase, expectedResult) {
     lastTestIndex++;
     if (testCaseKey != lastTestIndex) {
         throw new Error(`Test case key doesn't match test case index: ${testCaseKey} != ${lastTestIndex}`);
@@ -24,6 +24,7 @@ function addTestCase(testCaseKey, testCase, expectedResult) {
     newTestCase.innerHTML = `
         <th>${lastTestIndex}</th>
         <th>
+            <p>${testCaseDesc}</p>
             ${testCase}
         </th>
         <th><pre>${prettyJSON(expectedResult)}</pre></th>
@@ -31,7 +32,12 @@ function addTestCase(testCaseKey, testCase, expectedResult) {
         <th></th>
     `;
 
-    newTestCase.children[formIndex].querySelector("form").setAttribute("hx-target", `#test-case-${lastTestIndex}`)
+    const newTestCaseHTMLPre = document.createElement(`pre`);
+    const newTestCaseHTMLContent = document.createTextNode(testCase);
+    newTestCaseHTMLPre.appendChild(newTestCaseHTMLContent);
+
+    newTestCase.children[formIndex].appendChild(newTestCaseHTMLPre);
+    newTestCase.children[formIndex].querySelector("form").setAttribute("hx-target", `#test-case-${lastTestIndex}`);
     testCases.appendChild(newTestCase);
 }
 
@@ -170,6 +176,6 @@ window.onload = function() {
     setTimeout(
         function() {
             setTestResults(passedCount, lastTestIndex)
-        }, waitForAllTestsToComplete
+        }, waitForAllTestsToCompleteTimeout
     );
 }

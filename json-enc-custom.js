@@ -28,17 +28,22 @@
     function encodingAlgorithm(parameters, elt, includedElt) {
         let files = [];
         let resultingObject = Object.create(null);
+        const parseTypes = api.getAttributeValue(elt, "parse-types") === "true";
 
-        let parseTypes = api.getAttributeValue(elt, "parse-types") === "true";
-        let forceArray = (api.getAttributeValue(elt, "force-array") ?? "").split(",");
+        const names = new Set(Array.from(elt.elements, (e) => e.name));
 
-        const PARAM_NAMES = Object.keys(parameters);
-        const PARAM_VALUES = Object.values(parameters);
-        const PARAM_LENGTH = PARAM_NAMES.length;
+        for (const name of names) {
+            if (name.length === 0) {
+                continue;
+            }
 
-        for (let param_index = 0; param_index < PARAM_LENGTH; param_index++) {
-            let name = PARAM_NAMES[param_index];
-            let value = PARAM_VALUES[param_index];
+            let value = parameters.getAll(name);
+
+            if (value.length === 0) {
+                value = null;
+            } else if (value.length === 1) {
+                value = value[0];
+            }
 
             if (value instanceof File) {
                 files.push(value);
@@ -50,11 +55,18 @@
             } else {
                 const elements = getChildrenByName(elt, name);
 
-                if (!Array.isArray(value) && (
-                    forceArray.includes(name) || 
-                    isSelectMultiple(elements) // force the value of select multiple to be an array
-                )) {
-                    value = [value];    
+                console.log(elements);
+
+                if (isCheckbox(elements) && value === null) {
+                    value = "off";
+                } else if (isCheckboxArray(elements) && value === null) {
+                    value = [];
+                } else if (isSelectMultiple(elements) && !Array.isArray(value)) {
+                    if (value === null) {
+                        value = [];
+                    } else {
+                        value = [value];    
+                    }
                 }
                 
                 if (parseTypes) {
@@ -65,8 +77,8 @@
                 let steps = JSONEncodingPath(name);
                 let context = resultingObject;
 
-                for (let step_index = 0; step_index < steps.length; step_index++) {
-                    let step = steps[step_index];
+                for (let stepIndex = 0; stepIndex < steps.length; stepIndex++) {
+                    const step = steps[stepIndex];
                     context = setValueFromPath(context, step, value);
                 }
             }
@@ -99,6 +111,26 @@
         )
     }
 
+    function isCheckbox(elements) {
+         return (
+            elements.length === 1 &&
+            elements[0] instanceof HTMLInputElement &&
+            elements[0].type === "checkbox"
+        )
+    }
+
+    function isCheckboxArray(elements) {
+        if (elements.length === 0) {
+            return false;
+        }
+        for (const element of elements) {
+            if (!(element instanceof HTMLInputElement && element.type === "checkbox")) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     function parseValues(elements, includedElt, value) {
         if (!elements.length && includedElt !== undefined) {
             // "hx-include" allows CSS query selectors which may return an specific node, e.g a single input
@@ -123,12 +155,20 @@
             }
             return value;
         }
-
-        for (let index = 0; index < value.length; index++) {
-            let array_elt = elements[index];
-            let array_value = value[index];
-            value[index] = parseElementValue(array_elt, array_value);
+        
+        if (isCheckboxArray(elements)) {
+            for (let index = 0; index < elements.length; index++) {
+                let array_elt = elements[index];
+                value[index] = parseElementValue(array_elt, null);
+            }
+        } else {
+            for (let index = 0; index < value.length; index++) {
+                let array_elt = elements[index];
+                let array_value = value[index];
+                value[index] = parseElementValue(array_elt, array_value);
+            }
         }
+
         return value;
     }
 
@@ -182,7 +222,7 @@
             // []
             if (path.startsWith("[]")) {
                 path = path.slice(2);
-                steps.push({ "type": "array", "key": 0, "last": false, "next_type": null })
+                steps.push({ "type": "array", "key": null, "last": false, "next_type": null })
                 continue;
             }
             // [123...]
@@ -224,7 +264,24 @@
 
     function setValueFromPath(context, step, value) {
         if (step.last) {
-            context[step.key] = value;
+            if (step.key === null) {
+                if (value === null) {
+                    return context
+                }
+                if (step.type === "array") {
+                    if (!Array.isArray(value)) {
+                        context[0] = value;
+                    } else {
+                        for (const i in value) {
+                            context[i] = value[i];
+                        }
+                    }
+                }
+                return context;
+            } else if (value !== null) {
+                context[step.key] = value;  
+                return context[step.key];
+            }
         }
 
         //TODO: make merge functionality.
@@ -251,8 +308,7 @@
                     return context[step.key];
                 }
             }
-        }
-        else {
+        } else {
             return context[step.key];
         }
     }
