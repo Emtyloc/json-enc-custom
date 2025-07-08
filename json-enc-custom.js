@@ -30,7 +30,15 @@
         let resultingObject = Object.create(null);
 
         const parseTypes = api.getAttributeValue(elt, "parse-types") === "true";
-        const names = new Set(Array.from(elt.elements, (e) => e.name));
+        
+        let names;
+        if (elt.elements !== undefined) {
+            names = new Set(Array.from(elt.elements, (e) => e.name));
+        } else if (elt.form.elements !== undefined) {
+            names = new Set(Array.from(elt.form.elements, (e) => e.name));
+        } else {
+            return ""
+        }
 
         for (const name of names) {
             if (name.length === 0) {
