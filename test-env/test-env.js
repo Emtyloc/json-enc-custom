@@ -67,18 +67,23 @@ function submitAllForms() {
     const testTable = document.getElementById("test-cases");
     const testCases = Array.from(testTable.children);
     testCases.forEach(function(testCase, index) {
-        const form = testCase.querySelector("tr th form");
-        const inputTypeFile = form.querySelector('input[type="file"]');
-        if (inputTypeFile) {
-            let numberOfFiles;
-            if (inputTypeFile.hasAttribute("multiple")) {
-                numberOfFiles = 2;
-            } else {
-                numberOfFiles = 1;
+        let elt = testCase.querySelector("tr th div button");
+        if (!elt) elt = testCase.querySelector("tr th form");
+        if (elt.tagName === "FORM") {
+            const inputTypeFile = elt.querySelector('input[type="file"]');
+            if (inputTypeFile) {
+                let numberOfFiles;
+                if (inputTypeFile.hasAttribute("multiple")) {
+                    numberOfFiles = 2;
+                } else {
+                    numberOfFiles = 1;
+                }
+                simulateFileUpload(inputTypeFile, `test-case-${index + 1}`, "text/plain", numberOfFiles);
             }
-            simulateFileUpload(inputTypeFile, `test-case-${index + 1}`, "text/plain", numberOfFiles);
+            elt.requestSubmit();
+        } else if (elt.tagName === "BUTTON") {
+            elt.click();
         }
-        form.requestSubmit();
     })
 }
 

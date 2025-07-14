@@ -903,6 +903,71 @@
                     "select": [1, 2]
                 }`
             },
+            39: {
+                desc: "All possible tags in form, no values, hx-include, parse-types=true",
+                form:
+                `
+                <div>
+                    <form>
+                        <fieldset>
+                            <input name="number" type="number" value="">
+                            <input name="text" type="text" value="">
+                            <input name="checkbox" type="checkbox">
+                            <input name="checkbox2" type="checkbox">
+                            <input name="checkbox2" type="checkbox">
+                            <input name="unknown" value="">
+                        </fieldset>
+                        <textarea name="textarea"></textarea>
+                        <select name="select-one-combined">
+                            <optgroup label="String options">
+                                <option value="first">First</option>
+                                <option value="second">Second</option>
+                            </optgroup>
+                            <optgroup label="Number options">
+                                <option value="10">10</option>
+                                <option value="3.14">3.14</option>
+                            </optgroup>
+                        </select>
+                        <select name="select-one-numbers">
+                            <option value="10">10</option>
+                            <option value="3.14">3.14</option>
+                        </select>
+                        <select name="select-multiple-combined" multiple>
+                            <option value="multiple-1">multiple-1</option>
+                            <option value="multiple-2">multiple-2</option>
+                            <option value="3">3</option>
+                        </select>
+                        <select name="select-multiple-numbers" multiple>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                        </select>
+                    </form>
+                    <button 
+                        hx-include="previous form"
+                        hx-ext="json-enc-custom" 
+                        hx-post="/" 
+                        hx-target="closest tr" 
+                        parse-types="true"
+                        type="button"
+                    >
+                        Submit
+                    </button>
+                </div>
+                `,
+                expected: `{
+                    "number":0,
+                    "text":"",
+                    "checkbox":false,
+                    "checkbox2":[false,false],
+                    "unknown":"",
+                    "textarea":"",
+                    "select-one-combined":"first",
+                    "select-one-numbers":10,
+                    "select-multiple-combined":[],
+                    "select-multiple-numbers":[]
+                }`
+            },
         };
 
         const urlParams = new URLSearchParams(window.location.search);
