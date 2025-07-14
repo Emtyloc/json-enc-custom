@@ -19,7 +19,9 @@
                 xhr.overrideMimeType('text/json');
             }
 
-            let encoded_parameters = encodingAlgorithm(parameters, elt);
+            let includedElt = getIncludedElement(elt);
+
+            let encoded_parameters = encodingAlgorithm(parameters, elt, includedElt);
 
             return encoded_parameters;
         }
@@ -30,15 +32,24 @@
         let resultingObject = Object.create(null);
 
         const parseTypes = api.getAttributeValue(elt, "parse-types") === "true";
-        
+
         let names;
-        if (elt.elements !== undefined) {
-            names = new Set(Array.from(elt.elements, (e) => e.name));
-        } else if (elt.form.elements !== undefined) {
-            names = new Set(Array.from(elt.form.elements, (e) => e.name));
+
+        if (includedElt) {
+            if (includedElt.elements) {
+                names = new Set(Array.from(includedElt.elements, (e) => e.name));
+            } else if (includedElt.form && includedElt.form.elements) {
+                names = new Set(Array.from(includedElt.form.elements, (e) => e.name));
+            }
         } else {
-            return ""
+            if (elt.elements) {
+                names = new Set(Array.from(elt.elements, (e) => e.name));
+            } else if (elt.form && elt.form.elements) {
+                names = new Set(Array.from(elt.form.elements, (e) => e.name));
+            }
         }
+
+        if (!names) return "";
 
         for (const name of names) {
             if (name.length === 0) {
@@ -56,11 +67,10 @@
                 continue;
             }
 
-            const elements = getChildrenByName(elt, name);
+            const elements = getChildrenByName(elt, includedElt, name);
             value = prepareInputValueWithElements(value, elements);
 
             if (parseTypes) {
-                let includedElt = getIncludedElement(elt);
                 value = parseValues(elements, includedElt, value);
             }
 
@@ -104,7 +114,7 @@
             }
             return value;
         }
-        
+
         // force the select multiple and the checkbox array to always have an array value
         if (isSelectMultiple(elements) || isCheckboxArray(elements)) {
             if (Array.isArray(value)) {
@@ -119,25 +129,26 @@
         return value;
     }
 
-    function getChildrenByName(original, name) {
+    function getChildrenByName(elt, includedElt, name) {
         const match = `[name="${name}"]`;
         // find the closest owning form and use this as the root element for finding matches
-        return original.closest('form').querySelectorAll(match);
+        if (includedElt) return includedElt.closest('form').querySelectorAll(match);
+        return elt.closest('form').querySelectorAll(match);
     }
 
     function isSelectMultiple(elements) {
         return (
             elements.length === 1 &&
-            elements[0] instanceof HTMLSelectElement &&
-            elements[0].type === "select-multiple"
+                elements[0] instanceof HTMLSelectElement &&
+                elements[0].type === "select-multiple"
         )
     }
 
     function isCheckbox(elements) {
-         return (
+        return (
             elements.length === 1 &&
-            elements[0] instanceof HTMLInputElement &&
-            elements[0].type === "checkbox"
+                elements[0] instanceof HTMLInputElement &&
+                elements[0].type === "checkbox"
         )
     }
 
@@ -177,7 +188,7 @@
             }
             return value;
         }
-        
+
         if (isCheckboxArray(elements)) {
             for (let index = 0; index < elements.length; index++) {
                 let array_elt = elements[index];
@@ -196,20 +207,20 @@
 
     function parseElementValue(elt, value) {
         switch (true) {
-        case elt instanceof HTMLInputElement:
-            switch (elt.type) {
-            case "checkbox":
-                return elt.checked;
-            case "number":
-            case "range": 
-                return Number(value);
-            }
-            break;
-        case elt instanceof HTMLSelectElement:
-            if (elt.type === "select-one" && checkAllPossibleOptionsAreNumbers(elt)) {
-                return Number(value);
-            }
-            break;
+            case elt instanceof HTMLInputElement:
+                switch (elt.type) {
+                    case "checkbox":
+                        return elt.checked;
+                    case "number":
+                    case "range": 
+                        return Number(value);
+                }
+                break;
+            case elt instanceof HTMLSelectElement:
+                if (elt.type === "select-one" && checkAllPossibleOptionsAreNumbers(elt)) {
+                    return Number(value);
+                }
+                break;
         }        
         return value;
     }
@@ -235,7 +246,7 @@
         let first_key = String();
         for (let i = 0; i < path.length; i++) {
             if (path[i] !== "[") first_key += path[i];
-            else break;
+                else break;
         }
         if (first_key === "") return FAILURE;
         path = path.slice(first_key.length);
