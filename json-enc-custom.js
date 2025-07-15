@@ -82,8 +82,8 @@
                 context = setValueFromPath(context, step, value);
             }
         }
-
-        let result = JSON.stringify(resultingObject);
+        
+        let result = JSON.stringify({...resultingObject, ...api.getExpressionVars(elt)});
         if (elt.hasAttribute("hx-multipart")) {
             const formData = new FormData();
             formData.append("data", result);

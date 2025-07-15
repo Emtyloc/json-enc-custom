@@ -968,6 +968,52 @@
                     "select-multiple-numbers":[]
                 }`
             },
+            40: {
+                desc: "hx-vals, parse-types=true",
+                form:
+                `
+                <form 
+                    hx-ext="json-enc-custom" 
+                    hx-post="/" 
+                    hx-vals="js:{number: 20}"
+                    parse-types="true"
+                >
+                    <select name="select">
+                        <option value="1" selected>1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                    </select>
+                    <select name="select">
+                        <option value="1">1</option>
+                        <option value="2" selected>2</option>
+                        <option value="3">3</option>
+                    </select>
+                </form>
+                `,
+                expected: `{
+                    "select": [1, 2],
+                    "number": 20
+                }`
+            },
+            41: {
+                desc: "hx-vals overrides input with same name",
+                form:
+                `
+                <form 
+                    hx-ext="json-enc" 
+                    hx-post="/" 
+                    hx-vals="js:{number: 1}"
+                    parse-types="true"
+                >
+                        <fieldset>
+                            <input name="number" type="number" value="0">
+                        </fieldset>
+                </form>
+                `,
+                expected: `{
+                    "number": 1
+                }`
+            },
         };
 
         const urlParams = new URLSearchParams(window.location.search);
