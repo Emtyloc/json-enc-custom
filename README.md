@@ -5,15 +5,25 @@ Reference: [W3C HTML JSON form submission](https://www.w3.org/TR/html-json-forms
 
 ## Install
 
+#### Regular
+
 ```html
 <script src="https://cdn.jsdelivr.net/gh/Emtyloc/json-enc-custom@main/json-enc-custom.js"></script>
 <!-- Pointing to release (More production-safe) -->
-<script src="https://cdn.jsdelivr.net/gh/Emtyloc/json-enc-custom@v0.1.0/json-enc-custom.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/Emtyloc/json-enc-custom@v0.1.7/json-enc-custom.js"></script>
+```
+
+#### Minified (roughly half the size)
+
+```html
+<script src="https://cdn.jsdelivr.net/gh/Emtyloc/json-enc-custom@main/jec.min.js"></script>
+<!-- Pointing to release (More production-safe) -->
+<script src="https://cdn.jsdelivr.net/gh/Emtyloc/json-enc-custom@v0.1.7/jec.min.js"></script>
 ```
 
 ## Examples
 
-NB! You can see more example in `test.html`.
+**NB!** You can see more example in `test.html`.
 
 By default, the JSON sent uses the browser's form-encoding convention, which means everything is sent as a string. If you want to send parsed data, such as numbers or booleans for checkboxes, use `parse-types="true"`. (The parsing applies for inputs of type `checkbox`, `number`, `range`, `select`).
 
@@ -176,7 +186,7 @@ EXAMPLE 10: Bad input
 
 ## Testing
 
-To run the tests, simply open `test.html` in your browser.
+To run the tests, simply open `test.html` in your browser or run the `make test` command in your terminal.
 
 The tests function by automatically submitting a form from each test case. The resulting HTTP request that HTMX generates is then intercepted and compared against an expected request.
 
@@ -184,3 +194,9 @@ The tests function by automatically submitting a form from each test case. The r
 
 For debugging purposes, you can isolate a specific test case. To do this, add the `isolate-test` query parameter equal to the number of test case you want to isolate.
 For example: `http://127.0.0.1:5500/test.html?isolate-test=13`
+
+## Before release
+
+Make sure to update the minified version of the code with `make minify`.
+You should also check that the minified version passes all the tests like non-minified one.
+You can do this by running `make test-minify` (it will work only after `make minify` because that's where the test file for the minified version is generated).
