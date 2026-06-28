@@ -67,7 +67,10 @@
             }
         }
 
-        if (!names) return "";
+        if (!names)
+            return Object.keys(expressionVars).length === 0
+            ? ""
+            : JSON.stringify({ ...expressionVars });
 
         for (const name of names) {
             if (name.length === 0) {
